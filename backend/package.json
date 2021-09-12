@@ -1,0 +1,12 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "dependencies": {
+        "ethereumjs-util": "^7.1.0",
+        "ethers": "^5.4.6",
+        "sha3": "^2.1.4"
+    },
+    "devDependencies": {
+        "typescript": "^4.4.3"
+    }
+}
