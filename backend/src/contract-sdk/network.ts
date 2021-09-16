@@ -1,11 +1,7 @@
-
-import tls from 'tls';
-
-import net from 'net';
-
 import { randomUUID } from 'crypto';
-
 import events from 'events';
+import net from 'net';
+import tls from 'tls';
 
 export const MESSAGE_TYPE = {
     QUERY: 0x11,    // dirty trick, non-stardand type code, use to differentiate read-only request and transaction
@@ -17,13 +13,13 @@ export const MESSAGE_TYPE = {
     EVENT_LOG_PUSH: 0x1002
 };
 
-let emitters = new Map();
-let buffers = new Map();
-let sockets = new Map();
-let lastBytesRead = new Map();
+const emitters = new Map();
+const buffers = new Map();
+const sockets = new Map();
+const lastBytesRead = new Map();
 
-let blockNotifyCallbacks = new Map();
-let eventLogFilterCallbacks = new Map();
+const blockNotifyCallbacks = new Map();
+const eventLogFilterCallbacks = new Map();
 
 function checkErrorCode(errorCode: number) {
     switch (errorCode) {
@@ -42,12 +38,11 @@ function checkErrorCode(errorCode: number) {
 }
 
 function getEmitter(seq: string) {
-    let emitter = emitters.get(seq);
-    if (!emitter) {
+    if (!emitters.has(seq)) {
         // Stale message received
         return;
     }
-    emitter = emitter.emitter;
+    const { emitter } = emitters.get(seq);
     if (!emitter) {
         throw new Error(`unknown owner message receieved, seq=${seq}`);
     }
@@ -55,15 +50,15 @@ function getEmitter(seq: string) {
 }
 
 function parseResponse(buffer: Buffer) {
-    let seq = buffer.slice(6, 38).toString();
-    let type = buffer.slice(4, 6).readUInt16BE();
-    let errorCode = buffer.slice(38, 42).readUInt32BE();
+    const seq = buffer.slice(6, 38).toString();
+    const type = buffer.slice(4, 6).readUInt16BE();
+    const errorCode = buffer.slice(38, 42).readUInt32BE();
 
     switch (type) {
         case MESSAGE_TYPE.TRANSACTION_NOTIFY: {
             // transaction notification
             checkErrorCode(errorCode);
-            let emitter = getEmitter(seq);
+            const emitter = getEmitter(seq);
             if (emitter) {
                 const response = JSON.parse(buffer.slice(42).toString());
 
@@ -80,14 +75,14 @@ function parseResponse(buffer: Buffer) {
         case MESSAGE_TYPE.BLOCK_NOTIFY: {
             // block notification, which doesn't care about seq
             checkErrorCode(errorCode);
-            let data = buffer.slice(42);
+            const data = buffer.slice(42);
             // topic length = the actual topic length + 1, strange design
-            let topicLength = data.slice(0, 1).readUInt8();
+            const topicLength = data.slice(0, 1).readUInt8();
             const response = data.slice(topicLength).toString('ascii');
-            let [groupID, blockHeight] = response.split(',').map((str) => (parseInt(str)));
+            const [groupID, blockHeight] = response.split(',').map((str) => (parseInt(str)));
 
             if (blockNotifyCallbacks.has(groupID)) {
-                for (let callback of blockNotifyCallbacks.get(groupID)) {
+                for (const callback of blockNotifyCallbacks.get(groupID)) {
                     callback(groupID, blockHeight);
                 }
             }
@@ -96,11 +91,11 @@ function parseResponse(buffer: Buffer) {
         case MESSAGE_TYPE.CHANNEL_RPC_REQUEST: {
             // JSON RPC 2.0 format response
             checkErrorCode(errorCode);
-            let emitter = getEmitter(seq);
+            const emitter = getEmitter(seq);
             if (emitter) {
 
                 const response = JSON.parse(buffer.slice(42).toString());
-                let readOnly = Object.getOwnPropertyDescriptor(emitter, 'readOnly')?.value;
+                const readOnly = Object.getOwnPropertyDescriptor(emitter, 'readOnly')?.value;
 
                 if (readOnly) {
                     // read-only query
@@ -123,11 +118,11 @@ function parseResponse(buffer: Buffer) {
         case MESSAGE_TYPE.CLIENT_REGISTER_EVENT_LOG: {
             // result of register event
             checkErrorCode(errorCode);
-            let emitter = getEmitter(seq);
+            const emitter = getEmitter(seq);
             if (emitter) {
-                let data = buffer.slice(42);
+                const data = buffer.slice(42);
                 // topic length = the actual topic length + 1, strange design
-                let topicLength = data.slice(0, 1).readUInt8();
+                const topicLength = data.slice(0, 1).readUInt8();
                 const response = JSON.parse(data.slice(topicLength).toString());
                 emitter.emit('gotresult', response);
             }
@@ -136,9 +131,9 @@ function parseResponse(buffer: Buffer) {
         case MESSAGE_TYPE.EVENT_LOG_PUSH: {
             const response = JSON.parse(buffer.slice(42).toString());
 
-            let filterID = response.filterID;
+            const filterID = response.filterID;
             if (eventLogFilterCallbacks.has(filterID)) {
-                let callback = eventLogFilterCallbacks.get(filterID);
+                const callback = eventLogFilterCallbacks.get(filterID);
                 callback(response);
             }
 
@@ -149,33 +144,26 @@ function parseResponse(buffer: Buffer) {
     }
 }
 
-/**
- * Create a new TLS socket
- * @param {String} ip IP of channel server
- * @param {Number} port Port of channel server
- * @param {Object} authentication A JSON object contains certificate file path, private key file path and CA file path
- * @return {TLSSocket} A new TLS socket
- */
 function createNewSocket(ip: string, port: number, { key, ca, cert }: { key: string; ca: string; cert: string }) {
-    let secureContext = tls.createSecureContext({
+    const secureContext = tls.createSecureContext({
         key,
         cert,
         ca,
         ecdhCurve: 'secp256k1',
     });
 
-    let socket = new net.Socket();
+    const socket = new net.Socket();
     socket.connect(port, ip);
 
-    let clientOptions = {
+    const clientOptions = {
         rejectUnauthorized: false,
         secureContext,
         socket
     };
 
-    let tlsSocket = tls.connect(clientOptions);
+    const tlsSocket = tls.connect(clientOptions);
 
-    let socketID = `${ip}:${port}`;
+    const socketID = `${ip}:${port}`;
 
     lastBytesRead.set(socketID, 0);
 
@@ -199,7 +187,7 @@ function createNewSocket(ip: string, port: number, { key, ca, cert }: { key: str
             }
         } else {
             // Multiple reading
-            let cache = buffers.get(socketID);
+            const cache = buffers.get(socketID);
             cache.buffer = Buffer.concat([cache.buffer, response]);
             if (!cache.expectedLength && tlsSocket.bytesRead - lastBytesRead.get(socketID) >= 4) {
                 cache.expectedLength = cache.buffer.readUIntBE(0, 4);
@@ -227,10 +215,10 @@ function packWithHeader(data: Buffer, type: number) {
 
     const headerLength = 4 + 2 + 32 + 4;
 
-    let length = Buffer.alloc(4);
+    const length = Buffer.alloc(4);
     length.writeUInt32BE(headerLength + data.length);
 
-    let dataType = Buffer.alloc(2);
+    const dataType = Buffer.alloc(2);
     switch (type) {
         case MESSAGE_TYPE.QUERY:
         case MESSAGE_TYPE.CHANNEL_RPC_REQUEST:
@@ -241,11 +229,10 @@ function packWithHeader(data: Buffer, type: number) {
             break;
     }
 
-    let uuid = randomUUID();
-    uuid = uuid.replace(/-/g, '');
-    let seq = Buffer.from(uuid, 'ascii');
+    const uuid = randomUUID().replace(/-/g, '');
+    const seq = Buffer.from(uuid, 'ascii');
 
-    let result = Buffer.alloc(4);
+    const result = Buffer.alloc(4);
     result.writeInt32BE(0);
 
     return {
@@ -255,7 +242,7 @@ function packWithHeader(data: Buffer, type: number) {
 }
 
 function packData(data: string, type: number) {
-    let msg = Buffer.from(data, 'ascii');
+    const msg = Buffer.from(data, 'ascii');
 
     return packWithHeader(msg, type);
 }
@@ -268,22 +255,22 @@ function clearContext(uuid: string) {
     buffers.delete(uuid);
 }
 
-function channelPromise(data: object, type: number, node: { ip: string; port: number }, authentication: { key: string; ca: string; cert: string }, timeout?: number) {
-    let ip = node.ip;
-    let port = node.port;
+export function channelPromise<T>(data: object, type: number, node: { ip: string; port: number }, authentication: { key: string; ca: string; cert: string }, timeout?: number) {
+    const ip = node.ip;
+    const port = node.port;
 
-    let socketID = `${ip}:${port}`;
+    const socketID = `${ip}:${port}`;
 
     const { uuid, packagedData } = packData(JSON.stringify(data), type);
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise<T>(async (resolve, reject) => {
         // Singleton Socket instance
         if (!sockets.has(socketID)) {
-            let newSocket = createNewSocket(ip, port, authentication);
+            const newSocket = createNewSocket(ip, port, authentication);
             newSocket.unref();
             sockets.set(socketID, newSocket);
 
-            let clear = () => {
+            const clear = () => {
                 buffers.delete(socketID);
                 lastBytesRead.delete(socketID);
                 sockets.delete(socketID);
@@ -299,11 +286,11 @@ function channelPromise(data: object, type: number, node: { ip: string; port: nu
                 reject(new Error('disconnected from remote node'));
             });
         }
-        let tlsSocket = sockets.get(socketID);
+        const tlsSocket = sockets.get(socketID);
         tlsSocket.socketID = uuid;
 
         if (timeout) {
-            let eventEmitter = new events.EventEmitter();
+            const eventEmitter = new events.EventEmitter();
 
             if (type === MESSAGE_TYPE.QUERY || type === MESSAGE_TYPE.CHANNEL_RPC_REQUEST) {
                 Object.defineProperty(eventEmitter, 'readOnly', {
@@ -342,21 +329,18 @@ function channelPromise(data: object, type: number, node: { ip: string; port: nu
             tlsSocket.write(packagedData);
         } else {
             tlsSocket.write(packagedData);
-            resolve(undefined);
+            resolve(undefined as unknown as T);
         }
     });
 }
 
-function registerBlockNotifyCallback(groupID: number, callback: Function, node: { ip: string; port: number }, authentication: { key: string; ca: string; cert: string }) {
+export function registerBlockNotifyCallback(groupID: number, callback: Function, node: { ip: string; port: number }, authentication: { key: string; ca: string; cert: string }) {
     if (blockNotifyCallbacks.has(groupID)) {
         blockNotifyCallbacks.get(groupID).push(callback);
     } else {
         blockNotifyCallbacks.set(groupID, [callback]);
     }
 
-    let data = ['_block_notify_' + groupID];
+    const data = ['_block_notify_' + groupID];
     return channelPromise(data, MESSAGE_TYPE.AMOP_CLIENT_TOPICS, node, authentication);
 }
-
-export { channelPromise }
-export { registerBlockNotifyCallback }

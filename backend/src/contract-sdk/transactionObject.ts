@@ -1,12 +1,9 @@
-import { bufferToInt, toBuffer, ToBufferInputTypes } from 'ethereumjs-util';
 import { Keccak } from 'sha3';
-import { encode } from 'rlp';
+import { encode } from '@ethersproject/rlp';
 import { ecdsaRecover, ecdsaSign } from 'secp256k1';
 
-/**
- * Constructor of transaction
- * @param {data} data transaction data
- */
+const padToEven = (str: string) => str.length % 2 ? `0${str}` : str;
+
 export class Transaction {
     raw: Buffer[] = [];
     sig: Buffer[] = [
@@ -15,7 +12,7 @@ export class Transaction {
         Buffer.from([]) // s
     ];
 
-    constructor(data: Record<string, ToBufferInputTypes>) {
+    constructor(data: Record<string, string | number | Buffer>) {
         this.raw = [
             'randomid',
             'gasPrice',
@@ -27,7 +24,20 @@ export class Transaction {
             'chainId',
             'groupId',
             'extraData'
-        ].map((name) => name in data ? toBuffer(data[name]) : Buffer.from([]))
+        ].map((key) => {
+            const value = data[key];
+            if (Buffer.isBuffer(value)) {
+                return value;
+            }
+            switch (typeof value) {
+                case 'number':
+                    return Buffer.from(padToEven(value.toString(16)), 'hex');
+                case 'string':
+                    return Buffer.from(padToEven(value.slice(2)), 'hex');
+                default:
+                    return Buffer.from([]);
+            }
+        })
     }
 
     serialize() {
@@ -35,14 +45,13 @@ export class Transaction {
     }
 
     hash() {
-        // create hash
         return new Keccak(256).update(encode(this.raw)).digest()
     }
 
     verify() {
         const msgHash = this.hash();
         try {
-            ecdsaRecover(Buffer.concat(this.sig.slice(1)), bufferToInt(this.sig[0]) - 27, msgHash);
+            ecdsaRecover(Buffer.concat(this.sig.slice(1)), this.sig[0][0] - 27, msgHash);
             return true;
         } catch {
             return false;

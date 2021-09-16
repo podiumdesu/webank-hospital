@@ -1,58 +1,43 @@
-import { randomUUID } from 'crypto';
-
+import { randomBytes } from 'crypto';
+import { Configuration } from './config';
 import { Transaction } from './transactionObject';
 
-import { Configuration } from './config';
-
-export function genRandomID() {
-    return '0x' + randomUUID().replace(/-/g, '');
-}
-
-export function getSignTx(config: Configuration, to: string, txData: string, blockLimit: number) {
-    let groupID = config.groupID;
-    let account = config.account.address;
-    let privateKey = Buffer.from(config.account.privateKey, 'hex');
-    let chainID = config.chainID;
-
-    let postdata = {
+export function getSignTx(
+    { groupID, account: { address, privateKey }, chainID }: Configuration,
+    to: string,
+    txData: string,
+    blockLimit: number
+) {
+    const tx = new Transaction({
         data: txData,
-        from: account,
+        from: address,
         to,
         gas: 1000000,
-        randomid: genRandomID(),
+        randomid: randomBytes(16),
         blockLimit,
         chainId: chainID,
         groupId: groupID,
         extraData: '0x0'
-    };
-
-    let tx = new Transaction(postdata);
-    tx.sign(privateKey);
-    // Build a serialized hex version of the tx
-    return `0x${tx.serialize().toString('hex')}`;
+    });
+    tx.sign(Buffer.from(privateKey, 'hex'));
+    return tx.serialize();
 }
 
-export function getSignDeployTx(config: Configuration, bin: string, blockLimit: number) {
-    let groupID = config.groupID;
-    let account = config.account.address;
-    let privateKey = Buffer.from(config.account.privateKey, 'hex');
-    let chainID = config.chainID;
-    let txData = bin.startsWith('0x') ? bin : ('0x' + bin);
-
-    let postdata = {
-        data: txData,
-        from: account,
-        to: null,
+export function getSignDeployTx(
+    { groupID, account: { address, privateKey }, chainID }: Configuration,
+    bin: string,
+    blockLimit: number
+) {
+    const tx = new Transaction({
+        data: bin.startsWith('0x') ? bin : ('0x' + bin),
+        from: address,
         gas: 1000000,
-        randomid: genRandomID(),
+        randomid: randomBytes(16),
         blockLimit,
         chainId: chainID,
         groupId: groupID,
         extraData: '0x0'
-    };
-
-    let tx = new Transaction(postdata);
-    tx.sign(privateKey);
-    // Build a serialized hex version of the tx
-    return `0x${tx.serialize().toString('hex')}`;
+    });
+    tx.sign(Buffer.from(privateKey, 'hex'));
+    return tx.serialize();
 }

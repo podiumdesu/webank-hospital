@@ -1,18 +1,13 @@
 import assert from 'assert';
-
 import { utils } from 'ethers';
-
-import { channelPromise, MESSAGE_TYPE, registerBlockNotifyCallback } from './network';
-
-import { getSignDeployTx, getSignTx } from './web3sync';
-
 import { Configuration } from './config';
-import { JsonFragment } from '@ethersproject/abi';
+import { channelPromise, MESSAGE_TYPE, registerBlockNotifyCallback } from './network';
+import { getSignDeployTx, getSignTx } from './web3sync';
 
 const QUERY = MESSAGE_TYPE.QUERY;
 const TRANSACTION = MESSAGE_TYPE.CHANNEL_RPC_REQUEST;
 
-let blockHeightRecords = new Map();
+const blockHeightRecords = new Map();
 
 function updateBlockHeight(groupID: number, blockHeight: number) {
     if (!blockHeightRecords.has(groupID) || blockHeight > blockHeightRecords.get(groupID)) {
@@ -24,8 +19,8 @@ export class Web3jService {
     constructor(public config: Configuration) {
     }
 
-    _constructRequest(method: string, params: unknown[], type = QUERY) {
-        return channelPromise({
+    _constructRequest<T>(method: string, params: unknown[], type = QUERY) {
+        return channelPromise<T>({
             'jsonrpc': '2.0',
             method,
             params,
@@ -35,13 +30,12 @@ export class Web3jService {
 
     async getBlockHeight() {
         const { groupID, nodes, authentication } = this.config;
-    
+
         if (!blockHeightRecords.has(groupID)) {
-            let blockHeight: any = await this.getBlockNumber();
-            blockHeight = parseInt(blockHeight.result, 16);
-            blockHeightRecords.set(groupID, blockHeight);
+            const blockHeight: any = await this.getBlockNumber();
+            blockHeightRecords.set(groupID, parseInt(blockHeight.result, 16));
             // send block notify registration to all known nodes to get an accurate block height
-            for (let node of nodes) {
+            for (const node of nodes) {
                 registerBlockNotifyCallback(groupID, updateBlockHeight, node, authentication);
             }
             return blockHeightRecords.get(groupID);
@@ -145,19 +139,28 @@ export class Web3jService {
         return getSignTx(this.config, to, txData, blockLimit);
     }
 
-    async sendRawTransaction(to: string, f: JsonFragment, params: unknown[]) {
-        let iface = new utils.Interface([f]);
-        const func = iface.getFunction(f.name!);
+    async sendRawTransaction(to: string, f: string, params: unknown[]) {
+        const iface = new utils.Interface([f]);
+        const func = Object.values(iface.functions)[0];
 
-        let blockNumber = await this.getBlockHeight();
-        let txData = `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`;
-        let signTx = this._rawTransaction(to, txData, blockNumber + 500);
-        return this._constructRequest('sendRawTransaction', [this.config.groupID, signTx], TRANSACTION);
+        const blockNumber = await this.getBlockHeight();
+        const txData = `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`;
+        const signTx = this._rawTransaction(to, txData, blockNumber + 500);
+        const { status, statusMsg, output } = await this._constructRequest<{
+            status: string;
+            statusMsg: string;
+            output: string;
+        }>('sendRawTransaction', [this.config.groupID, signTx], TRANSACTION);
+        if (parseInt(status, 16)) {
+            throw new Error(statusMsg);
+        } else {
+            return utils.defaultAbiCoder.decode(func.outputs!, output);
+        }
     }
 
-    async deploy(abi: JsonFragment[], bin: string, parameters: unknown[]) {
-        let contractAbi = new utils.Interface(abi);
-        let inputs = contractAbi.deploy.inputs;
+    async deploy(abi: string[], bin: string, parameters: unknown[]) {
+        const contractAbi = new utils.Interface(abi);
+        const inputs = contractAbi.deploy.inputs;
         assert(inputs.length === parameters.length);
 
         let contractBin = bin;
@@ -165,21 +168,30 @@ export class Web3jService {
             contractBin += contractAbi._encodeParams(inputs, parameters);
         }
 
-        let blockNumber = await this.getBlockHeight();
-        let signTx = getSignDeployTx(this.config, contractBin, blockNumber + 500);
+        const blockNumber = await this.getBlockHeight();
+        const signTx = getSignDeployTx(this.config, contractBin, blockNumber + 500);
         return this._constructRequest('sendRawTransaction', [this.config.groupID, signTx], TRANSACTION);
     }
 
-    call(to: string, f: JsonFragment, params: unknown[]) {
-        let iface = new utils.Interface([f]);
-        const func = iface.getFunction(f.name!);
+    async call(to: string, f: string, params: unknown[]) {
+        const iface = new utils.Interface([f]);
+        const func = Object.values(iface.functions)[0];
 
-        let txData = `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`;
-        return this._constructRequest('call', [this.config.groupID, {
-            'from': this.config.account.address,
-            'to': to,
-            'value': '0x0',
-            'data': txData
+        const { result: { output, status } } = await this._constructRequest<{
+            result: {
+                output: string;
+                status: string;
+            }
+        }>('call', [this.config.groupID, {
+            from: this.config.account.address,
+            to,
+            value: '0x0',
+            data: `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`
         }]);
+        if (parseInt(status, 16)) {
+            throw new Error(`Failed to call ${f}`);
+        } else {
+            return utils.defaultAbiCoder.decode(func.outputs!, output);
+        }
     }
 }

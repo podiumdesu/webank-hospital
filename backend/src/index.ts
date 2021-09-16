@@ -1,6 +1,5 @@
 import { Configuration } from './contract-sdk/config';
 import { Web3jService } from './contract-sdk';
-import { utils } from 'ethers';
 
 const config = new Configuration({
     account: {
@@ -80,32 +79,17 @@ hqVrevrZykI9JUHk277cWf7h
 
 const web3j = new Web3jService(config);
 
-web3j.sendRawTransaction('0x0000000000000000000000000000000000005007', {
-    "constant": true,
-    "inputs": [
-        {
-            "name": "g",
-            "type": "string"
-        },
-        {
-            "name": "h",
-            "type": "string"
-        }
-    ],
-    "name": "generatorGen",
-    "outputs": [
-        {
-            "name": "",
-            "type": "string"
-        },
-        {
-            "name": "",
-            "type": "string"
-        }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-}, ['foo', 'bar']).then(console.log, console.log);
+web3j.getBlockHeight().then(console.log, console.error);
+web3j.getPbftView().then(console.log, console.error);
 
-console.log(new utils.AbiCoder().decode(['string', 'string'], '0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000006039313862623766376163346362333639396666396163663531666331616232333361646435313165326266346234363339363361666235613633316130303161323937316537616433323437386639356536653464303234303738343632313000000000000000000000000000000000000000000000000000000000000000c0386330613062633766373835383037396630393538663866396335626265356466613864333334643438613136653662353239633830356230646330383531393933373566613462663931343233643337663537616138616332326339363066613464623963643062336437336531336435336236306239343636663234313830663161636362626430323066366266373534353436396264393131653434666662363763663338353737346363393138393830326534383761663636343130'))
+web3j.sendRawTransaction(
+    '0x0000000000000000000000000000000000005007',
+    'function generatorGen(string g, string h) public pure returns (string, string)',
+    ['foo', 'bar']
+).then(console.log, console.error);
+
+web3j.call(
+    '0x0000000000000000000000000000000000005007',
+    'function generatorGen(string g, string h) public pure returns (string, string)',
+    ['foo', 'bar']
+).then(console.log, console.error);
