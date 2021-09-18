@@ -8,27 +8,25 @@ const modules = Object.assign(
     import.meta.glob('../../images/mainPage/*.png'),
     import.meta.glob('../../images/icon/*.png')
 )
-
-const grid2data = await Promise.all(Object.keys(
-  {
-    'medicalCard': {
-        category: '电子就诊卡',
-        clickText: '点击出示就诊卡 > ',
-        textColor: '#3C55D5'
-    },
-    'medicalRecord': {
-        category: '电子病历',
-        clickText: '查看往期病历 > ',
-        textColor: '#0BAE83',
-    }
+const grid2Json =  {
+  'medicalCard': {
+      category: '电子就诊卡',
+      clickText: '点击出示就诊卡 > ',
+      textColor: '#3C55D5'
+  },
+  'medicalRecord': {
+      category: '电子病历',
+      clickText: '查看往期病历 > ',
+      textColor: '#0BAE83',
   }
-).map((async i => {
+}
+const grid2data = await Promise.all(Object.keys(grid2Json).map((async i => {
     return {
         bg: (await modules[`../../images/mainPage/${i}-bg.png`]()).default,
         icon: (await modules[`../../images/mainPage/${i}-icon.png`]()).default,
-        category: grid2data[i].category,
-        clickText: grid2data[i].clickText,
-        textColor: grid2data[i].textColor
+        category: grid2Json[i].category,
+        clickText: grid2Json[i].clickText,
+        textColor: grid2Json[i].textColor
     }
 })))
 
