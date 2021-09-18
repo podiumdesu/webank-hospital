@@ -48,7 +48,7 @@
 
 早期的代理重加密方案存在诸多问题，如依赖可信第三方、重加密密钥的生成依赖通信双方的私钥等。2006年，Ateniese等人提出了可行且较为完备的方案（下称AFGH方案），该方案以双线性映射作为理论基础，解决了上述的问题。本作品实现了原文中3.2节介绍的方案，其整体流程如下图所示。
 
-![image.png](https://i.loli.net/2021/09/12/6q1jQyDRpNwGkoL.png)
+![image.png](https://i.loli.net/2021/09/18/9BTXhewmPtUrZFD.png)
 
 其中：
 * 密钥生成(KeyGen)：
@@ -89,7 +89,7 @@
 
 zk-STARK全称为*Zero-Knowledge Scalable Transparent Arguments of Knowledge*，即*可扩展的透明的零知识证明*。其中，**可扩展**是指随输入语句的扩展，证明的时间线性增加，而验证的时间对数增加；**透明**是指无需可信初始化。该方案分为**算术化**（Arithmetization）与**低度测试**（Low Degree Testing）两个步骤，其交互式版本如下图所示，使用*Fiat-Shamir变换*即可将其转换为非交互式版本。
 
-![image.png](https://i.loli.net/2021/09/12/wgrp1YliEmVoaWG.png)
+![image.png](https://i.loli.net/2021/09/18/fdklzKAFGrUZbIq.png)
 
 其中：
 * Arithmetization：
