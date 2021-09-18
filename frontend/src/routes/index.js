@@ -7,13 +7,14 @@ const routesConfig = [
     component: Home,
   },
   {
-    path: "/CardInfo",
-    component: loadable(() => import('@/pages/CardInfo'))
+    path: "/medicalCard",
+    component: loadable(() => import('@/pages/MedicalCard'))
   },
   {
     path: '/',
     component: Home
   },
+
 ]
 
 export default routesConfig
