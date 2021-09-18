@@ -1,0 +1,18 @@
+{
+    "outPatientAppointment": "门诊预约",
+    "sameDayRegis": "当日挂号",
+    "waitingInquiry": "候诊查询",
+    "reportProgress": "报告进度",
+    "physicalExamData": "体检数据",
+    "cloudDoctor": "云端医生",
+    "authData": "授权数据",
+    "outPatientPayment": "门诊缴费",
+    "outPatientRevisit": "门诊回访",
+    "checkAppointment": "检查预约",
+    "followUpMedicineDispensing": "在线复诊配药",
+    "outPatientInquiry": "出/停诊查询",
+    "covidInfo": "新冠疫情速递",
+    "covidTestAppointment": "核酸检测预约",
+    "hospitalizationHistory": "住院病史复印",
+    "electronicBill": "电子票据"
+}

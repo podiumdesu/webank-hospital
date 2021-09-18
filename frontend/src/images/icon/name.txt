@@ -1,0 +1,17 @@
+outPatientAppointment
+sameDayRegis
+waitingInquiry
+reportProgress
+physicalExamData
+cloudDoctor
+authData
+outPatientPayment
+outPatientRevisit
+checkAppointment
+followUpMedicineDispensing
+outPatientInquiry
+covidInfo
+covidTestAppointment
+hospitalizationHistory
+electronicBill
+name.txt
