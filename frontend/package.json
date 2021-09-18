@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "antd-mobile": "^2.3.4",
+    "ipfs-core": "^0.10.8",
     "mcl-wasm": "^0.7.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
