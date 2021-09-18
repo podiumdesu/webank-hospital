@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "dependencies": {
+    "@loadable/component": "^5.15.0",
     "antd-mobile": "^2.3.4",
     "ipfs-core": "^0.10.8",
     "mcl-wasm": "^0.7.9",
