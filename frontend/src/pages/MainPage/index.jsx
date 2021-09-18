@@ -35,11 +35,6 @@ const carouselData = await Promise.all(['covidTest', 'covidTest'].map(async i =>
     (await modules[`../../images/mainPage/carousel-${i}.png`]()).default 
 )))
 
-const data1 = Array.from(new Array(9)).map(() => ({
-    icon: 'https://gw.alipayobjects.com/zos/rmsportal/WXoqXTHrSnRcUwEaQgXJ.png',
-  }));
-
-  
 await Promise.all(Object.keys(categoryJSON).map(async (i) => {
     categoryIcon[i] = (await modules[`../../images/icon/${i}.png`]()).default
 }))
@@ -91,9 +86,10 @@ class App extends React.Component {
           ))}
         </Carousel>
         <Flex>
-            {grid2data.map((dataItem) => (
-                <Flex.Item>
-                    <div style={{
+            {grid2data.map((dataItem, i) => (
+                <Flex.Item key={i}>
+                    <div
+                      style={{
                         backgroundImage: `url(${dataItem.bg})`, 
                         backgroundSize: '100% auto', 
                         minHeight: '110px' , 
@@ -111,10 +107,10 @@ class App extends React.Component {
             ))}
         </Flex>
         <Grid data={this.state.gridData} hasLine={false} activeStyle={false}
-                  renderItem={dataItem => (
-                    <div style={{ padding: '0px' }}>
+                  renderItem={(dataItem, i) => (
+                    <div key={i} style={{ padding: '0px' }}>
                       <img src={dataItem.icon} style={{ width: '40%' }} alt='' />
-                      <div style={{ color: 'rgba(4, 52, 52, 0.7)', fontSize: '7px', margin: '5px 0 30px 0' }}>
+                      <div style={{ color: 'rgba(4, 52, 52, 0.7)', fontSize: '12px', margin: '5px 0 30px 0' }}>
                         <span>{dataItem.text}</span>
                       </div>
                     </div>
