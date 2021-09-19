@@ -1,5 +1,4 @@
 import React from 'react'
-import covidTest from '../../images/mainPage/carousel-covidTest.png'
 import { Link } from 'react-router-dom'
 import { Carousel, WingBlank, Flex } from 'antd-mobile';
 import './index.css'
@@ -33,10 +32,6 @@ const grid2data = await Promise.all(Object.keys(grid2Json).map((async i => {
 })))
 
 const categoryIcon = {}
-const carouselData = await Promise.all(['covidTest', 'covidTest'].map(async i => (
-  (await modules[`../../images/mainPage/carousel-${i}.png`]()).default
-)))
-
 await Promise.all(Object.keys(categoryJSON).map(async (i) => {
   categoryIcon[i] = (await modules[`../../images/icon/${i}.png`]()).default
 }))
