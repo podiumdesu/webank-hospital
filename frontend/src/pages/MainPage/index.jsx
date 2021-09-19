@@ -45,6 +45,7 @@ class App extends React.Component {
   state = {
     carouselData: [],
     gridData: [],
+    imgHeight: 176,
   }
 
   async componentDidMount() {
@@ -76,7 +77,8 @@ class App extends React.Component {
             <a
               key={val}
               href='/'
-              className='w-full'
+              className='w-full inline-block'
+              style={{ height: this.state.imgHeight }}
             >
               <img
                 src={val}
@@ -85,6 +87,7 @@ class App extends React.Component {
                 onLoad={() => {
                   // fire window resize event to change height
                   window.dispatchEvent(new Event('resize'));
+                  this.setState({ imgHeight: 'auto' });
                 }}
               />
             </a>
@@ -108,7 +111,7 @@ class App extends React.Component {
           {this.state.gridData.map((dataItem, i) => (
             <Link to={`/${dataItem.category}`} key={i}>
               <div className='flex flex-col items-center'>
-                <img src={dataItem.icon} className='w-2/5' alt='' />
+                <img src={dataItem.icon} className='w-1/2' alt='' />
                 <div className='mt-1 text-xs' style={{ color: 'rgba(4, 52, 52, 0.7)' }}>
                   <span>{dataItem.text}</span>
                 </div>
