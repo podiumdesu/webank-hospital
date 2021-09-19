@@ -158,7 +158,7 @@ export class Web3jService {
         }
     }
 
-    async deploy(abi: string[], bin: string, parameters: unknown[]) {
+    async deploy(abi: string, bin: string, parameters: unknown[]) {
         const contractAbi = new utils.Interface(abi);
         const inputs = contractAbi.deploy.inputs;
         assert(inputs.length === parameters.length);
@@ -170,7 +170,7 @@ export class Web3jService {
 
         const blockNumber = await this.getBlockHeight();
         const signTx = getSignDeployTx(this.config, contractBin, blockNumber + 500);
-        return this._constructRequest('sendRawTransaction', [this.config.groupID, signTx], TRANSACTION);
+        return this._constructRequest<{ contractAddress: string }>('sendRawTransaction', [this.config.groupID, signTx], TRANSACTION);
     }
 
     async call(to: string, f: string, params: unknown[]) {
