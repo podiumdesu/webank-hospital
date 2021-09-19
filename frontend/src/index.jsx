@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import routesConfig from './routes/index'
 import 'antd-mobile/dist/antd-mobile.css';
 import '@/styles/main.css';
-
+import "tailwindcss/tailwind.css";
 
 ReactDOM.render(
     <Router>
