@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "dependencies": {
         "ethers": "^5.4.6",
-        "express": "^4.17.1",
+        "fastify": "^3.21.3",
         "secp256k1": "^4.0.2",
         "sha3": "^2.1.4"
     },

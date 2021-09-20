@@ -1,6 +1,6 @@
 import { Configuration } from '../contract-sdk/config';
 
-export const config = new Configuration({
+export const clientConfig = new Configuration({
     account: {
         privateKey: `-----BEGIN PRIVATE KEY-----
 MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgdEYQ++b92Q+eTN/D4/2v
@@ -75,3 +75,7 @@ hqVrevrZykI9JUHk277cWf7h
 -----END CERTIFICATE-----`
     },
 });
+
+export const addresses = {
+    record: '0x62d853120adb5bf7569c1e8e56231a1c4737b268',
+};
