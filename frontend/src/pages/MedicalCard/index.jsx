@@ -14,12 +14,13 @@ class App extends React.Component {
                 >
                     电子就诊卡
                 </NavBar>
-                <div className='relative'>
-                    <div className='absolute top-8 left-6'>
-                        <p >李小红</p>
-                        <p>性别：女</p>
-                        <p>卡号：2342425325231</p>
-                        <p>切换就诊人</p>
+                <div className='relative m-1'>
+                    <div className='absolute top-5 left-6'>
+                        <p className='leading-8 text-base font-semibold mb-1'>李小红</p>
+                        <p className='text-xs leading-5'>性别：女</p>
+                        <p className='text-xs leading-5'>年龄：23岁</p>
+                        <p className='text-xs leading-5'>卡号：2342425325231</p>
+                        <p className='text-xs mt-5 w-24 text-center leading-5 rounded-2xl' style={{backgroundColor: '#61A1F8', color:'#3C55D5 '}}>⇆ 切换就诊人</p>
                     </div>
                     <p className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 pl-3 z-20 text-xs' style={{ color: '#252517', background: '#FBCD6F' }}>自费卡</p>
                     <img src={cardBg} className='w-full opacity-50' />
