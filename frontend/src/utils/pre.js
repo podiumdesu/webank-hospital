@@ -32,13 +32,13 @@ export function keyGen(g, sk = randomInFr()) {
 
 export function encrypt(plain, pk, g, h) {
     const r = randomInFr();
-    return {
-        ca0: add(deserializeHexStrToFr(plain), hashToFr(pow(pairing(g, h), r).serialize())),
-        ca1: mul(pk, r)
-    };
+    return [
+        add(deserializeHexStrToFr(plain), hashToFr(pow(pairing(g, h), r).serialize())),
+        mul(pk, r)
+    ];
 }
 
-export function decrypt({ ca0, ca1 }, sk, h) {
+export function decrypt([ca0, ca1], sk, h) {
     return serialize(sub(ca0, hashToFr(pow(pairing(ca1, h), inv(sk)).serialize())));
 }
 
@@ -46,11 +46,11 @@ export function reKeyGen(ska, pkb) {
     return mul(pkb, inv(ska));
 }
 
-export function reEncrypt({ ca0, ca1 }, reKey) {
-    return { cb0: ca0, cb1: pairing(ca1, reKey) };
+export function reEncrypt([ca0, ca1], reKey) {
+    return [ca0, pairing(ca1, reKey)];
 }
 
-export function reDecrypt({ cb0, cb1 }, sk) {
+export function reDecrypt([cb0, cb1], sk) {
     return serialize(sub(cb0, hashToFr(pow(cb1, inv(sk)).serialize())));
 }
 
