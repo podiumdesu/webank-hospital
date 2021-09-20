@@ -1,5 +1,4 @@
 import React from 'react'
-import { NavBar, Icon, WingBlank } from 'antd-mobile'
 import { Link } from 'react-router-dom'
 import blueFlower from '../../images/medicalCard/blueFlower.png'
 import cardBg from '../../images/medicalCard/cardBg.png'
@@ -37,13 +36,7 @@ class App extends React.Component {
     }
     render() {
         return (
-            <WingBlank>
-                <NavBar
-                    mode="light"
-                    icon={<Link to='/'><Icon type="left" className='-ml-4 text-black' /></Link>}
-                >
-                    电子就诊卡
-                </NavBar>
+            <>
                 <div className='relative m-1'>
                     <div className='absolute top-5 left-6'>
                         <p className='leading-8 text-base font-semibold mb-1'>李小红</p>
@@ -61,7 +54,7 @@ class App extends React.Component {
                 </div>
                 <p className='m-1 mt-8 flex items-center'>
                     <img className='inline-block w-4' src={blueFlower} />
-                    <span className='text-lg text-lg leading-6 ml-2' style={{ color: '#242424' }}>就诊功能</span>
+                    <span className='text-lg leading-6 ml-2' style={{ color: '#242424' }}>就诊功能</span>
                 </p>
                 <div className='grid grid-cols-4 gap-y-8 mt-8'>
                     {this.state.iconData.map((dataItem, i) => (
@@ -75,7 +68,7 @@ class App extends React.Component {
                         </Link>
                     ))}
                 </div>
-            </WingBlank>
+            </>
         )
 
     }

@@ -1,24 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import routesConfig from './routes/index'
+import { WingBlank } from 'antd-mobile'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { Routes } from './routes'
 import 'antd-mobile/dist/antd-mobile.css';
 import '@/styles/main.css';
 import "tailwindcss/tailwind.css";
+import { Header } from './components/Header';
 
 ReactDOM.render(
     <Router>
-        <Switch>
-            {routesConfig.map((route, i) => (
-                <Route
-                    key={i}
-                    path={route.path}
-                    render={props => (
-                        <route.component {...props} routes={route.routes} />
-                    )}
-                />
-            ))}
-        </Switch>
+        <WingBlank>
+            <Header />
+            <Routes />
+        </WingBlank>
     </Router>,
     document.getElementById('root')
 )
