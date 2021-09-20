@@ -45,7 +45,7 @@ class App extends React.Component {
 
   async componentDidMount() {
     this.setState({
-      carouselData: await Promise.all(['covidTest'].map(async i => {
+      carouselData: await Promise.all(['covidTest', 'covidMask', 'covidVacci'].map(async i => {
         return (await modules[`../../images/mainPage/carousel-${i}.png`]()).default
       })),
       gridData: Object.keys(categoryJSON).map((val) => ({
@@ -65,7 +65,7 @@ class App extends React.Component {
           医疗服务平台
         </p>
         <Carousel
-          autoplay={false}
+          autoplay
           infinite
         >
           {this.state.carouselData.map(val => (
