@@ -107,8 +107,8 @@ class App extends React.Component {
             <Link to={`/${dataItem.category}`} key={i}>
               <div className='flex flex-col items-center'>
                 <img src={dataItem.icon} className='w-1/2' alt='' />
-                <div className='mt-1 text-xs' style={{ color: 'rgba(4, 52, 52, 0.7)' }}>
-                  <span>{dataItem.text}</span>
+                <div className='mt-2 text-xs'>
+                  <span style={{ color: 'rgba(4, 52, 52, 0.6)' }}>{dataItem.text}</span>
                 </div>
               </div>
             </Link>
