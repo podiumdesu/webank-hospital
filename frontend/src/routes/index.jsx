@@ -1,7 +1,9 @@
 import React from 'react';
 import Home from '@/pages/MainPage';
-import MedicalCard from '@/pages/MedicalCard';
 import { useRoutes } from 'react-router-dom';
+import loadable from '@loadable/component'
+
+const MedicalCard = loadable(() => import('@/pages/MedicalCard'));
 
 export const routes = [
   {
