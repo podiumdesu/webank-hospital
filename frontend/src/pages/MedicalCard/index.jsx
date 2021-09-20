@@ -49,11 +49,11 @@ class App extends React.Component {
                         <p className='text-xs leading-5'>卡号：2342425325231</p>
                         <p className='text-xs mt-5 w-24 text-center leading-5 rounded-2xl' style={{ backgroundColor: '#61A1F8', color: '#3C55D5 ' }}>⇆ 切换就诊人</p>
                     </div>
-                    <p className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 pl-3 z-20 text-xs' style={{ color: '#252517', background: '#FBCD6F' }}>自费卡</p>
+                    <p className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 px-3 z-20 text-xs' style={{ color: '#252517', background: '#FBCD6F' }}>自费卡</p>
                     <img src={cardBg} className='w-full opacity-50' />
-                    <div className='absolute flex flex-col justify-center items-center w-full h-full top-0'>
-                        <img className='w-screen-1/4 h-w-screen-1/4 absolute right-6 top-10' src={qrCode}></img>
-                        <span className='font-bold text-whie text-base'></span>
+                    <div className='absolute right-6 top-10'>
+                        <img className='w-screen-1/4 h-w-screen-1/4' src={qrCode} />
+                        <p className='text-xs text-center pt-1' style={{ color: '#252517' }}>点击出示二维码</p>
                     </div>
                 </div>
                 <p className='m-1 mt-8 flex items-center'>
