@@ -1,14 +1,14 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import blueFlower from '../../images/medicalCard/blueFlower.png'
+import blueFlower from '../../images/icon/common/blueFlower.png'
 import cardBg from '../../images/medicalCard/cardBg.png'
 import allCategoryJSON from '@/config/category.json'
 import QRCode from 'qrcode';
 import { WingBlank } from 'antd-mobile';
+import { Section } from '@/components/Section'
 
 const modules = Object.assign(
     import.meta.glob('../../images/icon/*.png')
-  )
+)
 const categoryIcon = {}
 const selectIcon = [
     'outPatientAppointment',
@@ -42,7 +42,7 @@ class App extends React.Component {
     render() {
         return (
             <WingBlank>
-                <div className='relative m-1'>
+                <div className='relative mx-1 mb-8'>
                     <div className='absolute top-5 left-6'>
                         <p className='leading-8 text-base font-semibold mb-1'>李小红</p>
                         <p className='text-xs leading-5'>性别：女</p>
@@ -57,22 +57,7 @@ class App extends React.Component {
                         <p className='text-xs text-center pt-1' style={{ color: '#252517' }}>点击出示二维码</p>
                     </div>
                 </div>
-                <p className='m-1 mt-8 flex items-center'>
-                    <img className='inline-block w-4' src={blueFlower} />
-                    <span className='text-lg leading-6 ml-2' style={{ color: '#242424' }}>就诊功能</span>
-                </p>
-                <div className='grid grid-cols-4 gap-y-8 mt-8'>
-                    {this.state.iconData.map((dataItem, i) => (
-                        <Link to={`/${dataItem.category}`} key={i}>
-                            <div className='flex flex-col items-center'>
-                                <img src={dataItem.icon} className='w-1/2' alt='' />
-                                <div className='mt-2 text-xs'>
-                                    <span style={{color: 'rgba(4, 52, 52, 0.6)'}}>{dataItem.text}</span>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                <Section icon={blueFlower} title='就诊功能' items={this.state.iconData} />
             </WingBlank>
         )
 

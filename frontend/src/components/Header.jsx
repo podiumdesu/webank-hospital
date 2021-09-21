@@ -8,7 +8,7 @@ import { routes } from '@/routes';
 import { NavBar, Icon } from 'antd-mobile'
 
 export const Header = () => {
-    const [{ route: { title }, pathname}] = matchRoutes(routes, useLocation());
+    const [{ route: { title }, pathname }] = matchRoutes(routes, useLocation());
     return (
         <NavBar
             mode="light"

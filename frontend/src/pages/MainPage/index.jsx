@@ -3,11 +3,17 @@ import { Link } from 'react-router-dom'
 import { Carousel, Flex, WingBlank } from 'antd-mobile';
 import './index.css'
 import categoryJSON from '@/config/category.json'
+import { Section, SectionBody } from '@/components/Section';
+import blueFlower from '../../images/icon/common/blueFlower.png'
+import person from '../../images/icon/common/person.png'
 
 const modules = Object.assign(
   import.meta.glob('../../images/mainPage/*.png'),
   import.meta.glob('../../images/icon/*.png')
 )
+const otherIcons = import.meta.glob('/src/images/icon/other/*.png');
+const personalIcons = import.meta.glob('/src/images/icon/personal/*.png');
+
 const grid2Json = {
   'medicalCard': {
     category: '电子就诊卡',
@@ -31,15 +37,26 @@ const grid2data = await Promise.all(Object.keys(grid2Json).map((async i => {
   }
 })))
 
-const categoryIcon = {}
-await Promise.all(Object.keys(categoryJSON).map(async (i) => {
-  categoryIcon[i] = (await modules[`../../images/icon/${i}.png`]()).default
-}))
+const getSectionItems = (icons) => Promise.all(Object.entries(icons).map(async ([path, module]) => {
+  const name = path.match(/(?<=\d+ ).*(?=\.png)/);
+  return {
+    icon: (await module()).default,
+    text: name,
+    category: '/',
+  };
+}));
+
+const mainItems = await Promise.all(Object.entries(categoryJSON).map(async ([i, text]) => ({
+  icon: (await modules[`../../images/icon/${i}.png`]()).default,
+  text,
+  category: i,
+})));
+const otherItems = await getSectionItems(otherIcons);
+const personalItems = await getSectionItems(personalIcons);
 
 class App extends React.Component {
   state = {
     carouselData: [],
-    gridData: [],
     imgHeight: 176,
   }
 
@@ -48,68 +65,62 @@ class App extends React.Component {
       carouselData: await Promise.all(['covidTest', 'covidMask', 'covidVacci'].map(async i => {
         return (await modules[`../../images/mainPage/carousel-${i}.png`]()).default
       })),
-      gridData: Object.keys(categoryJSON).map((val) => ({
-        icon: categoryIcon[val],
-        text: categoryJSON[val],
-        category: val,
-      })),
     });
   }
 
   render() {
     return (
-      <WingBlank>
-        <Carousel
-          autoplay
-          infinite
-        >
-          {this.state.carouselData.map(val => (
-            <a
-              key={val}
-              href='/'
-              className='w-full inline-block'
-              style={{ height: this.state.imgHeight }}
-            >
-              <img
-                src={val}
-                alt=''
-                className='w-full'
-                onLoad={() => {
-                  // fire window resize event to change height
-                  window.dispatchEvent(new Event('resize'));
-                  this.setState({ imgHeight: 'auto' });
-                }}
-              />
-            </a>
-          ))}
-        </Carousel>
-        <Flex className='my-6'>
-          {grid2data.map((dataItem, i) => (
-            <Flex.Item key={i} className='relative'>
-              <img src={dataItem.bg} className='w-full' />
-              <div className='absolute flex flex-col justify-center items-center w-full h-full top-0'>
-                <p className='flex justify-center items-center gap-1.5'>
-                  <img className='w-4' src={dataItem.icon}></img>
-                  <span className='font-bold text-white text-base'>{dataItem.text}</span>
-                </p>
-                <Link className='text-xs' to={`/${dataItem.category}`} style={{ color: `${dataItem.textColor}` }}>{dataItem.clickText}</Link>
-              </div>
-            </Flex.Item>
-          ))}
-        </Flex>
-        <div className='grid grid-cols-4 gap-y-8'>
-          {this.state.gridData.map((dataItem, i) => (
-            <Link to={`/${dataItem.category}`} key={i}>
-              <div className='flex flex-col items-center'>
-                <img src={dataItem.icon} className='w-1/2' alt='' />
-                <div className='mt-2 text-xs'>
-                  <span style={{ color: 'rgba(4, 52, 52, 0.6)' }}>{dataItem.text}</span>
+      <>
+        <WingBlank>
+          <Carousel
+            // autoplay
+            infinite
+          >
+            {this.state.carouselData.map(val => (
+              <a
+                key={val}
+                href='/'
+                className='w-full inline-block'
+                style={{ height: this.state.imgHeight }}
+              >
+                <img
+                  src={val}
+                  alt=''
+                  className='w-full'
+                  onLoad={() => {
+                    // fire window resize event to change height
+                    window.dispatchEvent(new Event('resize'));
+                    this.setState({ imgHeight: 'auto' });
+                  }}
+                />
+              </a>
+            ))}
+          </Carousel>
+          <Flex className='my-6'>
+            {grid2data.map((dataItem, i) => (
+              <Flex.Item key={i} className='relative'>
+                <img src={dataItem.bg} className='w-full' />
+                <div className='absolute flex flex-col justify-center items-center w-full h-full top-0'>
+                  <p className='flex justify-center items-center gap-1.5'>
+                    <img className='w-4' src={dataItem.icon}></img>
+                    <span className='font-bold text-white text-base'>{dataItem.text}</span>
+                  </p>
+                  <Link className='text-xs' to={`/${dataItem.category}`} style={{ color: `${dataItem.textColor}` }}>{dataItem.clickText}</Link>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </WingBlank>
+              </Flex.Item>
+            ))}
+          </Flex>
+          <SectionBody items={mainItems} />
+        </WingBlank>
+        <div className='h-1 opacity-25' style={{ background: '#C8DBFF' }} />
+        <WingBlank>
+          <Section title='其他功能' items={otherItems} icon={blueFlower} />
+        </WingBlank>
+        <div className='h-1 opacity-25' style={{ background: '#C8DBFF' }} />
+        <WingBlank>
+          <Section title='个人中心' items={personalItems} icon={person} />
+        </WingBlank>
+      </>
     );
   }
 }
