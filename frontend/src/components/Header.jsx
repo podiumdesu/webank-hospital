@@ -12,7 +12,7 @@ export const Header = () => {
     return (
         <NavBar
             mode="light"
-            icon={pathname === '/' ? undefined : <Link to='/'><Icon type="left" className='-ml-4 text-black' /></Link>}
+            icon={pathname === '/' ? undefined : <Link to='/'><Icon type="left" className='text-black' /></Link>}
         >
             {title}
         </NavBar>

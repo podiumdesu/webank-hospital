@@ -4,6 +4,7 @@ import blueFlower from '../../images/medicalCard/blueFlower.png'
 import cardBg from '../../images/medicalCard/cardBg.png'
 import allCategoryJSON from '@/config/category.json'
 import QRCode from 'qrcode';
+import { WingBlank } from 'antd-mobile';
 
 const modules = Object.assign(
     import.meta.glob('../../images/icon/*.png')
@@ -40,7 +41,7 @@ class App extends React.Component {
     }
     render() {
         return (
-            <>
+            <WingBlank>
                 <div className='relative m-1'>
                     <div className='absolute top-5 left-6'>
                         <p className='leading-8 text-base font-semibold mb-1'>李小红</p>
@@ -72,7 +73,7 @@ class App extends React.Component {
                         </Link>
                     ))}
                 </div>
-            </>
+            </WingBlank>
         )
 
     }

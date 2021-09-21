@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Carousel, Flex } from 'antd-mobile';
+import { Carousel, Flex, WingBlank } from 'antd-mobile';
 import './index.css'
 import categoryJSON from '@/config/category.json'
 
@@ -58,7 +58,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <>
+      <WingBlank>
         <Carousel
           autoplay
           infinite
@@ -109,7 +109,7 @@ class App extends React.Component {
             </Link>
           ))}
         </div>
-      </>
+      </WingBlank>
     );
   }
 }
