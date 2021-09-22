@@ -1,6 +1,5 @@
 import React from 'react'
 import { WingBlank } from 'antd-mobile'
-import moment from 'moment'
 
 import './index.css'
 
@@ -37,7 +36,9 @@ class ShowPart extends React.Component {
                 <WingBlank>
                     { report.map((i, _idx) => (
                         <div className='bg-white w-full p-4 my-4 rounded-xl' key={_idx}>
-                            <p className='pb-2 text-6178EE'><span className='font-normal'>{moment(i.time).format('YYYY年MM月DD日')}</span> <span>{moment(i.time).format('hh:mm')}</span></p>
+                            <p className='pb-2 text-6178EE'>
+                                <span className='font-normal'>{new Date(i.time).toLocaleString('zh-CN', { dateStyle: 'long' })} {new Date(i.time).toLocaleString('zh-CN', { timeStyle: 'short', hour12: false })}</span>
+                            </p>
                             <p className='text-light-black leading-6'>申请科室：{i.applicationDepartment}  医生：{i.applicationDoctor}</p>
                             <p className='text-light-black leading-6'>检查科室：{i.checkDepartment}  医生：{i.checkDoctor}</p>
                             <p className='text-light-black leading-6'>检查项目：{i.checkItem}</p>
