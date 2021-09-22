@@ -73,7 +73,7 @@ class App extends React.Component {
       <>
         <WingBlank>
           <Carousel
-            // autoplay
+            autoplay
             infinite
           >
             {this.state.carouselData.map(val => (
