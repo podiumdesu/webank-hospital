@@ -1,0 +1,47 @@
+[
+    {
+        "type": "unchecked",
+        "time": 1632147106474,
+        "applicationDepartment": "华山医院（外科）",
+        "applicationDoctor": "张三",
+        "checkDepartment": "华山医院（检查科）",
+        "checkDoctor": "李四",
+        "checkItem": "头颅CT",
+        "waitingRoom": "K002",
+        "medicalRecordId": ""
+    },
+    {
+        "type": "unfinished",
+        "time": 1632147306474,
+        "applicationDepartment": "华山医院（内科）",
+        "applicationDoctor": "张三",
+        "checkDepartment": "华山医院（检查科）",
+        "checkDoctor": "李四",
+        "checkItem": "头颅CT",
+        "waitingRoom": "K002",
+        "medicalRecordId": ""
+    },
+    {
+        "type": "finished",
+        "time": 1632127106474,
+        "applicationDepartment": "华山医院（脑科）",
+        "applicationDoctor": "张三",
+        "checkDepartment": "华山医院（检查科）",
+        "checkDoctor": "李四",
+        "checkItem": "头颅CT",
+        "waitingRoom": "K002",
+        "medicalRecordId": "2839580498260103"
+    },
+    {
+        "type": "finished",
+        "time": 1632117106474,
+        "applicationDepartment": "华山医院（脑科）",
+        "applicationDoctor": "张三",
+        "checkDepartment": "华山医院（检查科）",
+        "checkDoctor": "李四",
+        "checkItem": "头颅CT",
+        "waitingRoom": "K002",
+        "medicalRecordId": "2839580498260103"
+    }
+
+]
