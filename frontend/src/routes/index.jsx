@@ -4,12 +4,23 @@ import { useRoutes } from 'react-router-dom';
 import loadable from '@loadable/component'
 
 const MedicalCard = loadable(() => import('@/pages/MedicalCard'));
-
+const MedicalRecord = loadable(() => import('@/pages/MedicalRecord'));
+const ReportProgress = loadable(() => import('@/pages/ReportProgress'))
 export const routes = [
   {
-    path: "/medicalCard",
+    path: '/medicalCard',
     element: <MedicalCard />,
     title: '电子就诊卡'
+  },
+  {
+    path: '/medicalRecord',
+    element: <MedicalRecord />,
+    title: '电子病历'
+  },
+  {
+    path: '/reportProgress',
+    element: <ReportProgress />,
+    title: '报告进度'
   },
   {
     path: '*',
