@@ -1,6 +1,5 @@
 import React from "react";
 import {
-    Link,
     useLocation,
     matchRoutes
 } from "react-router-dom";
@@ -12,7 +11,7 @@ export const Header = () => {
     return (
         <NavBar
             mode="light"
-            icon={pathname === '/' ? undefined : <Link to='/'><Icon type="left" className='text-black' /></Link>}
+            icon={pathname === '/' ? undefined : <Icon onClick={() => history.back()} type="left" className='text-black' />}
         >
             {title}
         </NavBar>
