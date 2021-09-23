@@ -22,6 +22,17 @@
         "medicalRecordId": ""
     },
     {
+        "type": "unfinished",
+        "time": 1622147306474,
+        "applicationDepartment": "华山医院（内科）",
+        "applicationDoctor": "张三",
+        "checkDepartment": "华山医院（检查科）",
+        "checkDoctor": "李四",
+        "checkItem": "头颅CT",
+        "waitingRoom": "K002",
+        "medicalRecordId": ""
+    },
+    {
         "type": "finished",
         "time": 1632127106474,
         "applicationDepartment": "华山医院（脑科）",
