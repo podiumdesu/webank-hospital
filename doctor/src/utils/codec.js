@@ -17,7 +17,7 @@ export const uint8ArrayToBase64 = (arr) => {
 export const toUint8Array = (str, encoding) => {
     switch (encoding) {
         case 'utf-8':
-            return  new TextEncoder().encode(str);
+            return new TextEncoder().encode(str);
         case 'hex':
             return hexToUint8Array(str);
         case 'base64':

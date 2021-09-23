@@ -40,7 +40,7 @@ export const Upload = ({ control, name, rules, defaultValue, shouldUnregister, .
                 ),
                 ...rest.InputProps,
             }}
-            size='small'
+            size="small"
             {...rest}
             value={value?.[0]?.name ?? rest.value ?? ''}
         />

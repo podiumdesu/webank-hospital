@@ -11,6 +11,10 @@ export class AES {
         this.#algorithm = algorithm;
     }
 
+    get iv() {
+        return uint8ArrayToHex(this.#iv);
+    }
+
     static convertKey(key, algorithm = 'AES-GCM') {
         return crypto.subtle.importKey(
             'raw',
@@ -26,10 +30,6 @@ export class AES {
 
     static convertIV(iv) {
         return hexToUint8Array(iv);
-    }
-
-    get iv() {
-        return uint8ArrayToHex(this.#iv);
     }
 
     async encrypt(

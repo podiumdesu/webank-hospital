@@ -25,7 +25,7 @@ export const Input = ({ control, name, rules, defaultValue, shouldUnregister, ..
             error={invalid}
             inputRef={ref}
             required
-            size='small'
+            size="small"
             {...rest}
         />
     );

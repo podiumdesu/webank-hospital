@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { render } from 'react-dom';
 
 import {
     BottomNavigation,
     BottomNavigationAction,
+    Box,
     Button,
     CssBaseline,
     Dialog,
@@ -18,12 +19,6 @@ import {
     StepContent,
     StepLabel,
     Stepper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     TextField,
     ThemeProvider,
     Toolbar,
@@ -40,33 +35,9 @@ import { Input } from './components/Textfields/Input';
 import { randomHexString } from './utils/random';
 import { toDataURL } from 'qrcode';
 import { AES } from './utils/aes';
-import { G1, encrypt, generatorGen, randomGen } from './utils/pre';
+import { encrypt, G1, generatorGen, randomGen } from './utils/pre';
 import { add } from './utils/ipfs';
-
-const EnhancedTable = ({ columns, rows }) => (
-    <TableContainer>
-        <Table size="small">
-            <TableHead>
-                <TableRow>
-                    {columns.map((column, index) => (
-                        <TableCell key={index}>
-                            {column}
-                        </TableCell>
-                    ))}
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {rows.map((row, index) => (
-                    <TableRow hover key={index}>
-                        {row.map((cell, index) => (
-                            <TableCell key={index}>{cell}</TableCell>
-                        ))}
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    </TableContainer>
-);
+import { Table } from './components/Table';
 
 const Basic = ({ onSubmit }) => {
     const {
@@ -114,7 +85,14 @@ const Basic = ({ onSubmit }) => {
                 <Input name="diagnosis" label="诊断意见" control={control} multiline rows={3} />
                 <Input name="plan" label="诊断计划" control={control} multiline rows={3} />
             </Stack>
-            <Fab disabled={!isValid} variant="extended" size="small" color="primary" sx={{ position: 'fixed', top: 16, right: 16, zIndex: 'speedDial' }} type="submit">
+            <Fab
+                disabled={!isValid}
+                variant="extended"
+                size="small"
+                color="primary"
+                sx={{ position: 'fixed', top: 16, right: 16, zIndex: 'speedDial' }}
+                type="submit"
+            >
                 <Send />
                 提交
             </Fab>
@@ -146,20 +124,16 @@ const Prescription = ({ drugs, setDrugs }) => {
                     <Add />
                 </IconButton>
             </Toolbar>
-            <EnhancedTable
+            <Table
                 columns={[
-                    <IconButton onClick={() => {
-                        setDrugs([]);
-                    }}>
+                    <IconButton onClick={() => setDrugs([])}>
                         <DeleteForever />
                     </IconButton>,
                     '药品名',
                     '溯源码',
                 ]}
                 rows={drugs.map((drug, i) => [
-                    <IconButton onClick={() => {
-                        setDrugs((drugs) => drugs.filter((_, j) => i !== j));
-                    }}>
+                    <IconButton onClick={() => setDrugs((drugs) => drugs.filter((_, j) => i !== j))}>
                         <Delete />
                     </IconButton>,
                     ...drug
@@ -199,20 +173,16 @@ const Examination = ({ attachments, setAttachments }) => {
                     <Add />
                 </IconButton>
             </Toolbar>
-            <EnhancedTable
+            <Table
                 columns={[
-                    <IconButton onClick={() => {
-                        setAttachments([]);
-                    }}>
+                    <IconButton onClick={() => setAttachments([])}>
                         <DeleteForever />
                     </IconButton>,
                     '附件名',
                     'CID',
                 ]}
                 rows={attachments.map((attachment, i) => [
-                    <IconButton onClick={() => {
-                        setAttachments((attachments) => attachments.filter((_, j) => i !== j));
-                    }}>
+                    <IconButton onClick={() => setAttachments((attachments) => attachments.filter((_, j) => i !== j))}>
                         <Delete />
                     </IconButton>,
                     ...attachment
@@ -239,13 +209,10 @@ const Scanner = ({ onData }) => {
                     inversionAttempts: "dontInvert",
                 });
                 if (code) {
-                    const { location: { topRightCorner, topLeftCorner, bottomLeftCorner, bottomRightCorner }, binaryData } = code;
+                    const { location: { topRightCorner, bottomRightCorner, bottomLeftCorner, topLeftCorner }, binaryData } = code;
                     canvas.beginPath();
                     canvas.moveTo(topLeftCorner.x, topLeftCorner.y);
-                    canvas.lineTo(topRightCorner.x, topRightCorner.y);
-                    canvas.lineTo(bottomRightCorner.x, bottomRightCorner.y);
-                    canvas.lineTo(bottomLeftCorner.x, bottomLeftCorner.y);
-                    canvas.lineTo(topLeftCorner.x, topLeftCorner.y);
+                    [topRightCorner, bottomRightCorner, bottomLeftCorner, topLeftCorner].forEach(({ x, y }) => canvas.lineTo(x, y));
                     canvas.lineWidth = 4;
                     canvas.strokeStyle = "#FF3B58";
                     canvas.stroke();
@@ -256,7 +223,7 @@ const Scanner = ({ onData }) => {
                 }
             }
             requestAnimationFrame(tick);
-        }
+        };
         video.srcObject = stream;
         video.play();
         requestAnimationFrame(tick);
@@ -266,7 +233,7 @@ const Scanner = ({ onData }) => {
 
 const { g, h } = generatorGen('foo', 'bar');
 
-const SubmissionDialog = ({ open, data }) => {
+const SubmissionDialog = ({ open, data, setData }) => {
     const [pk, setPK] = useState('');
     const [step, setStep] = useState(0);
     const [result, setResult] = useState('');
@@ -283,15 +250,11 @@ const SubmissionDialog = ({ open, data }) => {
     };
     const handleUpload = async () => {
         const dk = randomGen();
-        console.log(dk);
         const aes = new AES(await AES.convertKey(dk));
         const c = await aes.encrypt(data);
         const iv = aes.iv;
         const { cid } = await add(JSON.stringify({ c, iv }));
         const [ca0, ca1] = encrypt(dk, pk, g, h);
-        console.log(cid, cid.bytes);
-        console.log(ca0, ca0.serialize());
-        console.log(ca1, ca1.serialize());
         setResult(await toDataURL([{
             data: [...cid.bytes, ...ca0.serialize(), ...ca1.serialize()],
             mode: 'byte',
@@ -322,7 +285,10 @@ const SubmissionDialog = ({ open, data }) => {
                         <StepLabel>数据上链</StepLabel>
                         <StepContent>
                             <Typography>请让用户扫描下图所示的二维码</Typography>
-                            <img src={result} />
+                            <Box component='img' src={result} display='block' />
+                            <Button onClick={() => setData('')}>
+                                完成
+                            </Button>
                         </StepContent>
                     </Step>
                 </Stepper>
@@ -343,7 +309,7 @@ const Edit = () => {
             <Basic onSubmit={handleSubmit} />
             <Prescription drugs={drugs} setDrugs={setDrugs} />
             <Examination attachments={attachments} setAttachments={setAttachments} />
-            <SubmissionDialog open={!!data} data={data} />
+            <SubmissionDialog open={!!data} data={data} setData={setData} />
         </Stack>
     );
 };
