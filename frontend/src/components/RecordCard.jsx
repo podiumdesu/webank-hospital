@@ -16,8 +16,8 @@ export const RecordCard = ({ time, title, description, attachment }) => {
         <CardContainer
             left={
                 <div className='flex-1'>
-                    <p className='text-dark-black font-bold'>{new Date(time).toLocaleString('zh-CN', { dateStyle: 'long' })}</p>
-                    <p className='text-dark-black font-bold'>{title}</p>
+                    <p className='text-dark-black font-medium mb-1.5'>{new Date(time).toLocaleString('zh-CN', { dateStyle: 'long' })}</p>
+                    <p className='text-dark-black font-semibold text-base mb-0.5'>{title}</p>
                     <p className='text-6178EE'>{description}</p>
                 </div>
             }
