@@ -96,7 +96,7 @@ class App extends React.Component {
               </a>
             ))}
           </Carousel>
-          <Flex className='my-6'>
+          <Flex className='mb-6 mt-3'>
             {grid2data.map((dataItem, i) => (
               <Flex.Item key={i} className='relative'>
                 <img src={dataItem.bg} className='w-full' />
