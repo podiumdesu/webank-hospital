@@ -2,7 +2,7 @@ import mcl from 'mcl-wasm/browser';
 
 await mcl.init(mcl.BLS12_381);
 
-const {
+export const {
     deserializeHexStrToG1,
     deserializeHexStrToG2,
     deserializeHexStrToFr,
@@ -17,6 +17,7 @@ const {
     pairing,
     hashToFr,
     Fr,
+    G1,
 } = mcl;
 
 export function generatorGen(g, h, fromHex = false) {
@@ -66,17 +67,4 @@ export function randomInFr() {
 
 export function serialize(obj) {
     return obj.serializeToHexStr();
-}
-
-export function deserialize(str, group) {
-    switch (group) {
-        case 'Fr':
-            return deserializeHexStrToFr(str);
-        case 'G1':
-            return deserializeHexStrToG1(str);
-        case 'G2':
-            return deserializeHexStrToG2(str);
-        case 'GT':
-            return deserializeHexStrToGT(str);
-    }
 }

@@ -32,11 +32,11 @@ import jsQR from 'jsqr';
 import { Upload } from './components/Textfields/Upload';
 import { Controller, useForm } from 'react-hook-form';
 import { Input } from './components/Textfields/Input';
-import { randomHexString } from './utils/random';
+import { randomHexString } from '#/utils/random';
 import { toDataURL } from 'qrcode';
-import { AES } from './utils/aes';
-import { encrypt, G1, generatorGen, randomGen } from './utils/pre';
-import { add } from './utils/ipfs';
+import { AES } from '#/utils/aes';
+import { encrypt, G1, generatorGen, randomGen } from '#/utils/pre';
+import { add } from '#/utils/ipfs';
 import { Table } from './components/Table';
 
 const Basic = ({ onSubmit }) => {

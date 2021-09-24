@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toDataURL } from 'qrcode';
-import { generatorGen, keyGen } from '@/utils/pre';
+import { generatorGen, keyGen } from '#/utils/pre';
 
 const { g, h } = generatorGen('foo', 'bar');
 
