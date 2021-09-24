@@ -53,19 +53,13 @@ const mainItems = await Promise.all(Object.entries(categoryJSON).map(async ([i, 
 })));
 const otherItems = await getSectionItems(otherIcons);
 const personalItems = await getSectionItems(personalIcons);
+const carouselData = await Promise.all(['covidTest', 'covidMask', 'covidVacci'].map(async i => {
+  return (await modules[`../../images/mainPage/carousel-${i}.png`]()).default
+}))
 
 class App extends React.Component {
   state = {
-    carouselData: [],
     imgHeight: 176,
-  }
-
-  async componentDidMount() {
-    this.setState({
-      carouselData: await Promise.all(['covidTest', 'covidMask', 'covidVacci'].map(async i => {
-        return (await modules[`../../images/mainPage/carousel-${i}.png`]()).default
-      })),
-    });
   }
 
   render() {
@@ -76,7 +70,7 @@ class App extends React.Component {
             autoplay
             infinite
           >
-            {this.state.carouselData.map(val => (
+            {carouselData.map(val => (
               <a
                 key={val}
                 href='/'
