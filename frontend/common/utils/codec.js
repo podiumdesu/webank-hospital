@@ -11,7 +11,7 @@ export const base64ToUint8Array = (str) => {
 };
 
 export const uint8ArrayToBase64 = (arr) => {
-    return window.btoa(String.fromCharCode(...arr));
+    return window.btoa(arr.reduce((data, byte) => data + String.fromCharCode(byte), ''));
 };
 
 export const toUint8Array = (str, encoding) => {
@@ -22,6 +22,8 @@ export const toUint8Array = (str, encoding) => {
             return hexToUint8Array(str);
         case 'base64':
             return base64ToUint8Array(str);
+        case '':
+            return str;
     }
 };
 
@@ -33,5 +35,7 @@ export const fromUint8Array = (arr, encoding) => {
             return uint8ArrayToHex(arr);
         case 'utf-8':
             return new TextDecoder().decode(arr);
+        case '':
+            return arr;
     }
 };
