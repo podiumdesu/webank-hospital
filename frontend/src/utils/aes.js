@@ -1,6 +1,10 @@
 import { fromUint8Array, hexToUint8Array, toUint8Array, uint8ArrayToHex } from './codec';
 
 export class AES {
+    #key;
+    #iv;
+    #algorithm;
+
     constructor(key, iv, algorithm = 'AES-GCM') {
         this.#key = key;
         this.#iv = iv ?? crypto.getRandomValues(new Uint8Array(algorithm === 'AES-GCM' ? 12 : 16));
