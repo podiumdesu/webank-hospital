@@ -31,7 +31,7 @@ export const Examination = ({ attachments, setAttachments }) => {
             reader.onerror = () => reject(reader.error);
             reader.readAsArrayBuffer(attachment[0]);
         });
-        const { cid } = await add(JSON.stringify([await aes.encrypt(data, ''), aes.iv]));
+        const { cid } = await add(new Blob([aes.iv, await aes.encrypt(data, '', '')]));
         setAttachments((attachments) => [...attachments, [attachment[0].name ?? '', cid.toString(), dk]]);
         reset({ attachment: null });
     };

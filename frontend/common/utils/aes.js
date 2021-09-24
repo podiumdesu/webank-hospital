@@ -1,4 +1,4 @@
-import { fromUint8Array, hexToUint8Array, toUint8Array, uint8ArrayToHex } from './codec';
+import { fromUint8Array, hexToUint8Array, toUint8Array } from './codec';
 
 export class AES {
     #key;
@@ -29,7 +29,7 @@ export class AES {
     }
 
     get iv() {
-        return uint8ArrayToHex(this.#iv);
+        return this.#iv;
     }
 
     async encrypt(

@@ -25,7 +25,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
     const handleUpload = async () => {
         const dk = randomGen();
         const aes = new AES(await AES.convertKey(dk));
-        const { cid } = await add(JSON.stringify([await aes.encrypt(data), aes.iv]));
+        const { cid } = await add(new Blob([aes.iv, await aes.encrypt(data, 'utf-8', '')]));
         const [ca0, ca1] = encrypt(dk, pk, g, h);
         setResult(await toDataURL([{
             data: [...cid.bytes, ...ca0.serialize(), ...ca1.serialize()],
@@ -62,7 +62,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
                         <StepContent>
                             <Typography>请让用户扫描下图所示的二维码</Typography>
                             <Box component="img" src={result} display="block" />
-                            <Button onClick={onFinish}>
+                            <Button onClick={handleFinish}>
                                 完成
                             </Button>
                         </StepContent>
