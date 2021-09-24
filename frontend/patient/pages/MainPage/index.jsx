@@ -11,8 +11,8 @@ const modules = Object.assign(
   import.meta.glob('../../images/mainPage/*.png'),
   import.meta.glob('../../images/icon/*.png')
 )
-const otherIcons = import.meta.glob('/src/images/icon/other/*.png');
-const personalIcons = import.meta.glob('/src/images/icon/personal/*.png');
+const otherIcons = import.meta.glob('../../images/icon/other/*.png');
+const personalIcons = import.meta.glob('../../images/icon/personal/*.png');
 
 const grid2Json = {
   'medicalCard': {
