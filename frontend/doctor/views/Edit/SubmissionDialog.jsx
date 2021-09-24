@@ -40,7 +40,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
     return (
         <Dialog open={open}>
             <DialogTitle>提交病历</DialogTitle>
-            <DialogContent>
+            {open && <DialogContent>
                 <Stepper activeStep={step} orientation="vertical">
                     <Step>
                         <StepLabel>获取用户公钥</StepLabel>
@@ -68,7 +68,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
                         </StepContent>
                     </Step>
                 </Stepper>
-            </DialogContent>
+            </DialogContent>}
         </Dialog>
     );
 };
