@@ -25,9 +25,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
     const handleUpload = async () => {
         const dk = randomGen();
         const aes = new AES(await AES.convertKey(dk));
-        const c = await aes.encrypt(data);
-        const iv = aes.iv;
-        const { cid } = await add(JSON.stringify({ c, iv }));
+        const { cid } = await add(JSON.stringify([await aes.encrypt(data), aes.iv]));
         const [ca0, ca1] = encrypt(dk, pk, g, h);
         setResult(await toDataURL([{
             data: [...cid.bytes, ...ca0.serialize(), ...ca1.serialize()],
