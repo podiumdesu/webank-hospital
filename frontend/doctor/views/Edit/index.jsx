@@ -42,6 +42,8 @@ export const Edit = () => {
     const onFinish = () => {
         reset(getDefaultValue());
         setData('');
+        setDrugs([]);
+        setAttachments([]);
     };
     return (
         <Stack spacing={1} flex="1" overflow="auto" p={1}>
