@@ -1,23 +1,43 @@
 import { defineConfig } from 'vite';
-import path from 'path';
+import { resolve } from 'path';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 
 export default defineConfig({
   plugins: [reactRefresh()],
+  define: {
+    'process.env.DUMP_SESSION_KEYS': '""'
+  },
   resolve: {
     alias: {
-      '@/': path.resolve(__dirname, './src'),
-      '@/config': path.resolve(__dirname, './src/config'),
-      '@/components': path.resolve(__dirname, './src/components'),
-      '@/styles': path.resolve(__dirname, './src/styles'),
-      '@/utils': path.resolve(__dirname, './src/utils'),
-      // '@/common': path.resolve(__dirname, './src/common'),
-      // '@/assets': path.resolve(__dirname, './src/assets'),
-      '@/pages': path.resolve(__dirname, './src/pages'),
-      '@/routes': path.resolve(__dirname, './src/routes'),
-      // '@/layouts': path.resolve(__dirname, './src/layouts'),
-      // '@/hooks': path.resolve(__dirname, './src/hooks'),
-      // '@/store': path.resolve(__dirname, './src/store')
+      '@motrix/nat-api': './lib/empty.js',
+      'dlv': './lib/dlv.js',
+      'randombytes': './lib/randombytes.js',
+      'electron-fetch': './lib/empty.js',
+      'mortice': './lib/mortice.js',
+      'readable-stream': './lib/readable-stream/index.js',
+      'levelup': './lib/levelup.js',
+      'level-js': './lib/level-js.js',
+
+      '@/': resolve(__dirname, './patient'),
+      '@/config': resolve(__dirname, './patient/config'),
+      '@/components': resolve(__dirname, './patient/components'),
+      '@/styles': resolve(__dirname, './patient/styles'),
+      '@/utils': resolve(__dirname, './patient/utils'),
+      // '@/common': resolve(__dirname, './patient/common'),
+      // '@/assets': resolve(__dirname, './patient/assets'),
+      '@/pages': resolve(__dirname, './patient/pages'),
+      '@/routes': resolve(__dirname, './patient/routes'),
+      // '@/layouts': resolve(__dirname, './patient/layouts'),
+      // '@/hooks': resolve(__dirname, './patient/hooks'),
+      // '@/store': resolve(__dirname, './patient/store')
     }
   },
+  build: {
+    rollupOptions: {
+      input: {
+        doctor: resolve(__dirname, 'doctor.html'),
+        patient: resolve(__dirname, 'patient.html')
+      }
+    }
+  }
 });
