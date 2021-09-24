@@ -1,0 +1,5 @@
+This directory contains some libraries (with issues fixed) that are direct or indirect dependencies of `ipfs-core`, which should be considered as shame of JavaScript libraries because they assume that their runtime is Node.js and therefore uses `global`, `Buffer` and Node built-in APIs, while there are more general and universal solutions such as `globalThis`, `Uint8Array` and some Web APIs (like `WebCrypto`, which is both supported in browsers and Node.js). The code quality is also low on average and some of the libraries still contain ES5-style code like prototype-based class definitions, even if they are actively maintained in 2021.
+
+Yes, webpack can handle these shits well because it includes node polyfills by default for developers, but it is discouraged in v5 and other new building tools do not browserify these Node-specific APIs.
+
+`ipfs-core` developers should choose packages more carefully and detect the platform in a better way if they claim that `ipfs` is compatible with the web.
