@@ -33,6 +33,10 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
         }]));
         setStep(2);
     };
+    const handleFinish = () => {
+        onFinish();
+        setStep(0);
+    }
     return (
         <Dialog open={open}>
             <DialogTitle>提交病历</DialogTitle>
