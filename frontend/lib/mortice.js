@@ -260,7 +260,7 @@ module.exports = (name, options) => {
 }
 
 module.exports.Worker = function (script, Impl) {
-    Impl = Impl || global.Worker
+    Impl = Impl || globalThis.Worker
     let worker
 
     try {
