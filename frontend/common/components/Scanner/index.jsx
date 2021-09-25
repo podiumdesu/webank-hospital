@@ -25,7 +25,7 @@ export const Scanner = ({ onData }) => {
                     canvas.lineWidth = 4;
                     canvas.strokeStyle = "#FF3B58";
                     canvas.stroke();
-                    if (onData(binaryData)) {
+                    if (onData(new Uint8Array(binaryData))) {
                         stream.getTracks().forEach(track => track.stop());
                         return;
                     }

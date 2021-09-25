@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { encrypt, G1, randomGen } from '#/utils/pre';
 import { AES } from '#/utils/aes';
 import { add } from '#/utils/ipfs';
-import { g, h } from '$/constants';
+import { g, h } from '#/constants';
 import { toDataURL } from 'qrcode';
 import { Box, Button, Dialog, DialogContent, DialogTitle, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
-import { Scanner } from '$/components/Scanner';
+import { Scanner } from '#/components/Scanner';
 
 export const SubmissionDialog = ({ open, data, onFinish }) => {
     const [pk, setPK] = useState('');
