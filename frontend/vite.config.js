@@ -10,7 +10,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@motrix/nat-api': './lib/empty.js',
-      'dlv': './lib/dlv.js',
       'randombytes': './lib/randombytes.js',
       'electron-fetch': './lib/empty.js',
       'mortice': './lib/mortice.js',
