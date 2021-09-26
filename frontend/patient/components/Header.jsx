@@ -1,7 +1,8 @@
 import React from "react";
 import {
     useLocation,
-    matchRoutes
+    matchRoutes,
+    Link
 } from "react-router-dom";
 import { routes } from '@/routes';
 import { NavBar, Icon } from 'antd-mobile'
@@ -11,7 +12,7 @@ export const Header = () => {
     return (
         <NavBar
             mode="light"
-            icon={pathname === '/' ? undefined : <Icon onClick={() => history.back()} type="left" className='text-black' />}
+            icon={pathname === '/' ? undefined : <Link to={`${useLocation().pathname}/../`}><Icon type="left" className='text-black' /></Link>}
         >
             {title}
         </NavBar>
