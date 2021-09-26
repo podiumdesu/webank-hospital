@@ -4,6 +4,7 @@
     "dependencies": {
         "ethers": "^5.4.6",
         "fastify": "^3.21.3",
+        "fastify-cors": "^6.0.2",
         "secp256k1": "^4.0.2",
         "sha3": "^2.1.4"
     },

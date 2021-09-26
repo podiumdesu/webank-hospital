@@ -1,10 +1,13 @@
 import fastify from 'fastify';
+import cors from 'fastify-cors';
 
 import { clientConfig, addresses } from './config';
 import { Web3jService } from './contract-sdk';
 
 const web3j = new Web3jService(clientConfig);
 const server = fastify({ logger: true });
+
+server.register(cors);
 
 server.get<{ Params: { id: string } }>('/records/:id', async ({ params: { id } }, res) => {
     const [key] = await web3j.call(
