@@ -18,12 +18,13 @@ server.get<{ Params: { id: string } }>('/records/:id', async ({ params: { id } }
     res.send(key);
 });
 
-server.post<{ Params: { id: string }, Body: [string, string] }>('/records/:id', async ({ params: { id }, body: [ca0, ca1] }) => {
+server.post<{ Params: { id: string }, Body: [string, string] }>('/records/:id', async ({ params: { id }, body: [ca0, ca1] }, res) => {
     await web3j.sendRawTransaction(
         addresses.record,
         'function set(string memory id, string[2] memory key) public',
         [id, [ca0, ca1]],
     );
+    res.send();
 });
 
 server.get<{ Params: { id: string, pk: string } }>('/records/:id/rk/:pk', async ({ params: { id, pk } }, res) => {
