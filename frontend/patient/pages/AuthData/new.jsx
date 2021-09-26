@@ -9,7 +9,8 @@ import { hmac } from '#/utils/hmac';
 import { deriveKeyFromPassword } from '#/utils/kdf';
 import { AES } from '#/utils/aes';
 import { cat } from '#/utils/ipfs';
-import { set } from 'idb-keyval';
+import { setRecord } from '#/api';
+import { db, stores } from '@/stores/idb';
 
 const { Step } = Steps;
 
@@ -24,7 +25,7 @@ export default () => {
     const [cid, setCid] = useState();
     const [ca, setCa] = useState();
     const [sk, setSk] = useState();
-    const [memo, setMemo] = useState();
+    const [data, setData] = useState();
     useEffect(() => {
         const { pk, sk } = keyGen(g);
         toDataURL([{
@@ -33,15 +34,33 @@ export default () => {
         }]).then(setSrc);
         setSk(sk);
     }, []);
-    const handleData = (data) => {
+    const handleData = async (data) => {
         try {
-            setCid(CID.decode(data.slice(0, 34)));
+            // validate and set cid
+            const cid = CID.decode(data.slice(0, 34));
+            setCid(cid);
 
-            const ca0 = new Fr();
-            ca0.deserialize(data.slice(34, 66));
-            const ca1 = new G1();
-            ca1.deserialize(data.slice(-48));
-            setCa([ca0, ca1]);
+            // validate and set ca
+            const ca = [new Fr(), new G1()];
+            ca[0].deserialize(data.slice(34, 66));
+            ca[1].deserialize(data.slice(-48));
+            setCa(ca);
+
+            // check whether ca is the encryption of dk
+            const dk = decrypt(ca, sk, h);
+
+            // check whether cid points to a file
+            const buffers = [];
+            for await (const buffer of cat(cid)) {
+                buffers.push(buffer);
+            }
+            const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
+
+            // check whethter the file is correctly encrypted
+            const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
+
+            // display the data and wait user for approvement
+            setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
 
             setStep(2);
             return true;
@@ -50,18 +69,13 @@ export default () => {
         }
     }
     const handleUpload = async () => {
-        const dk = decrypt(ca, sk, h);
-        const buffers = [];
-        for await (const buffer of cat(cid)) {
-            buffers.push(buffer);
-        }
-        const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
-        const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
-        const data = JSON.parse(await aes.decrypt(buffer.slice(12), ''));
-        await set(cid.bytes, sk);
-
-        const id = await hmac(cid.bytes, hk, '');
-        // TODO: call the contract
+        await setRecord(await hmac(cid.bytes, hk, ''), ca.map(i => i.serializeToHexStr()));
+        await db.put(stores.record, {
+            date: new Date(data.date),
+            hospital: data.hospital,
+            diagnosis: data.diagnosis,
+            sk
+        }, cid.bytes);
     }
     return (
         <WingBlank>
@@ -83,7 +97,15 @@ export default () => {
                     </div>,
                     <>
                         <List>
-                            <InputItem value={memo} onChange={setMemo} placeholder='请输入简短的备注'>备注</InputItem>
+                            <List.Item extra={data?.hospital}>
+                                医院
+                            </List.Item>
+                            <List.Item extra={data?.doctor}>
+                                医生
+                            </List.Item>
+                            <List.Item extra={data?.diagnosis}>
+                                诊断意见
+                            </List.Item>
                         </List>
                         <Button className='mt-2' type="primary" onClick={handleUpload}>数据上链</Button>
                     </>,
