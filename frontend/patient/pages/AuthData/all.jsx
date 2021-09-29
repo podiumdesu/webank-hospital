@@ -2,10 +2,10 @@ import React from 'react';
 import { WingBlank, Icon } from 'antd-mobile';
 import { RecordCard, CardContainer } from '@/components/RecordCard';
 import { Link } from 'react-router-dom'
-import allMedicalRecord from '@/config/medicalRecord.json'
-import allPhysicalExamRecord from '@/config/physicalExam'
+import { db, stores } from '@/stores/idb';
 
-const allRecord = allMedicalRecord.concat(allPhysicalExamRecord)
+const cids = await db.getAllKeys(stores.record);
+const record = await Promise.all(cids.map(async (cid) => [cid, await db.get(stores.record, cid)]));
 
 export default () => {
     return (
@@ -23,9 +23,9 @@ export default () => {
                 }
             />
             {
-                allRecord.map((i, _idx) => (
-                    <RecordCard time={i.time} title={i.title} description={i.description} 
-                                attachment={i.attachment} key={_idx}></RecordCard>
+                record.map(([cid, { time, title, description, attachments }], _idx) => (
+                    <RecordCard time={time} title={title} description={description} 
+                                attachment={attachments} key={_idx}></RecordCard>
                 ))
             }
         </WingBlank>

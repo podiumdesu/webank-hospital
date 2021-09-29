@@ -71,9 +71,10 @@ export default () => {
     const handleUpload = async () => {
         await setRecord(await hmac(cid.bytes, hk, ''), ca.map(i => i.serializeToHexStr()));
         await db.put(stores.record, {
-            date: new Date(data.date),
-            hospital: data.hospital,
-            diagnosis: data.diagnosis,
+            time: new Date(data.time),
+            title: `${data.hospital} ${data.department}`,
+            description: data.diagnosis,
+            attachments: data.attachments.map(([name]) => name).join(', '),
             sk
         }, cid.bytes);
     }
