@@ -31,9 +31,10 @@ mod medical_record {
             self.keys.get(&id).unwrap().clone()
         }
 
-        
         pub fn set(&mut self, id: String, key: [String; 2]) {
-            self.keys.insert(&id, key);
+            if !self.keys.contains_key(&id) {
+                self.keys.insert(&id, key);
+            }
         }
 
         pub fn re_encrypt(&self, id: String, rk: String) -> [String; 2] {
