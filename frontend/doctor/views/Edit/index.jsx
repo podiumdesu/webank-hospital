@@ -8,13 +8,14 @@ import { Examination } from './Examination';
 import { SubmissionDialog } from './SubmissionDialog';
 
 const getDefaultValue = () => ({
-    hospital: '人民医院',
+    hospital: '宝钢医院',
+    department: '呼吸科',
     doctor: '刘伟',
     number: randomHexString(),
     name: '',
     gender: '',
     age: '',
-    date: new Date(),
+    time: new Date(),
     cc: '',
     history: '',
     sign: '',
