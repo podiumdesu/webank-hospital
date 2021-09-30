@@ -60,8 +60,9 @@ export default () => {
             // display the data and wait user for approvement
             setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
 
-            setStep(2);
-            Toast.success('扫描成功');
+            Toast.success('扫描成功', 1, () => {
+                setStep(2);
+            });
             return true;
         } catch (e) {
             Toast.fail(e.message);
