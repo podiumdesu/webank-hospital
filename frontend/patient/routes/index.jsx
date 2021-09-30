@@ -5,11 +5,11 @@ import loadable from '@loadable/component'
 
 const MedicalCard = loadable(() => import('@/pages/MedicalCard'));
 const MedicalRecord = loadable(() => import('@/pages/MedicalRecord'));
-const MedicalRecordDetail = loadable(() => import('@/pages/MedicalRecord/detail'));
+const DetailedMedicalRecord = loadable(() => import('@/pages/MedicalRecord/detail'));
 const ReportProgress = loadable(() => import('@/pages/ReportProgress'));
-const AuthData = loadable(() => import('@/pages/AuthData'));
 const NewAuthData = loadable(() => import('@/pages/AuthData/new'));
 const AllAuthData = loadable(() => import('@/pages/AuthData/all'));
+const DetailedAuthData = loadable(() => import('@/pages/AuthData/detail'));
 
 export const routes = [
   {
@@ -24,7 +24,7 @@ export const routes = [
     children: [
       {
         path: ':cid',
-        element: <MedicalRecordDetail />,
+        element: <DetailedMedicalRecord />,
       },
       {
         path: '',
@@ -39,9 +39,13 @@ export const routes = [
   },
   {
     path: '/authData',
-    element: <AuthData />,
+    element: <Outlet />,
     title: '授权数据',
     children: [
+      {
+        path: ':cid',
+        element: <DetailedAuthData />
+      },
       {
         path: 'new',
         element: <NewAuthData />,

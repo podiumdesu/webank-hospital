@@ -5,6 +5,7 @@ import { LocalizationProvider } from '@mui/lab';
 import { Add, Download } from '@mui/icons-material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { Edit } from '$/views/Edit';
+import { Get } from '$/views/Get';
 
 const theme = responsiveFontSizes(createTheme({}));
 
@@ -16,7 +17,7 @@ export const App = () => {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <Stack height="100vh" bgcolor="#fafafa">
-                    {value === 0 ? <Edit /> : null}
+                    {value === 0 ? <Edit /> : <Get />}
                     <BottomNavigation
                         showLabels
                         value={value}

@@ -30,7 +30,7 @@ export default () => {
                         title={title}
                         description={description}
                         attachment={attachments}
-                        to={`/medicalRecord/${CID.decode(cid).toString()}`}
+                        to={CID.decode(cid).toString()}
                         key={_idx}
                     />
                 ))
