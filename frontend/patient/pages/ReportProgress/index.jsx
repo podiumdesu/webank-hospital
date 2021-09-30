@@ -1,8 +1,6 @@
 import React from 'react'
 import { WingBlank } from 'antd-mobile'
 
-import './index.css'
-
 import allReport from '@/config/reportProgress.json'
 
 
@@ -64,7 +62,7 @@ class App extends React.Component {
     }
     render() {
         return (
-            <div className='h-full' style={{ background: 'rgba(200, 219, 255, 0.2)' }}>
+            <div className='flex-1 bg-[#C8DBFF33]'>
                 <div className='pt-4'>
                     {
                         Object.keys(filterReport).map((i) => (

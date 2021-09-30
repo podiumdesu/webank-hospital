@@ -4,7 +4,7 @@ import { Icon } from "antd-mobile";
 
 export const CardContainer = ({ left, right, children }) => {
     return (
-        <div className='w-full my-3 p-4 rounded-lg flex relative' style={{ backgroundColor: 'rgba(200, 219, 255, 20%)' }}>
+        <div className='w-full my-3 p-4 rounded-lg flex relative bg-[#C8DBFF33]'>
             {left}
             {right}
             {children}
@@ -28,10 +28,11 @@ export const RecordCard = ({ time, title, description, attachment, to }) => {
                 </div>
             }
         >
-            {attachment && <p
-                className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 px-3 z-20 text-xs'
-                style={{ color: '#252517', background: '#FBCD6F' }}
-            >{attachment}</p>}
+            {attachment && (
+                <p className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 px-3 z-20 text-xs text-dark-black bg-[#FBCD6F]'>
+                    {attachment}
+                </p>
+            )}
         </CardContainer>
     )
-}
+};

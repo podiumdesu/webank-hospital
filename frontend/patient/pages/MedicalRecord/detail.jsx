@@ -5,7 +5,7 @@ import pill from '@/images/medicalRecord/pill.png';
 
 export default () => {
     return (
-        <div className='flex-1 bg-[#c8dbff33]'>
+        <div className='flex-1 bg-[#C8DBFF33]'>
             <WingBlank className='flex flex-col gap-5 py-4'>
                 <div className='bg-white w-full p-4 rounded-xl'>
                     <div className='flex justify-between text-[#60A2F8]'>

@@ -106,11 +106,11 @@ class App extends React.Component {
           </Flex>
           <SectionBody items={mainItems} />
         </WingBlank>
-        <div className='h-1 opacity-25' style={{ background: '#C8DBFF' }} />
+        <div className='h-1 opacity-25 bg-[#C8DBFF]' />
         <WingBlank>
           <Section title='其他功能' items={otherItems} icon={blueFlower} />
         </WingBlank>
-        <div className='h-1 opacity-25' style={{ background: '#C8DBFF' }} />
+        <div className='h-1 opacity-25 bg-[#C8DBFF]' />
         <WingBlank>
           <Section title='个人中心' items={personalItems} icon={person} />
         </WingBlank>
