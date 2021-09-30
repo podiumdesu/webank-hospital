@@ -5,7 +5,10 @@ import { clientConfig, addresses } from './config';
 import { Web3jService } from './contract-sdk';
 
 const web3j = new Web3jService(clientConfig);
-const server = fastify({ logger: true });
+const server = fastify({
+    logger: true,
+    maxParamLength: 192
+});
 
 server.register(cors);
 
