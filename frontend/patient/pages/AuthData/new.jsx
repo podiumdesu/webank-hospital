@@ -3,29 +3,27 @@ import { toDataURL } from 'qrcode';
 import { keyGen, G1, Fr, decrypt } from '#/utils/pre';
 import { Scanner } from '#/components/Scanner';
 import { g, h } from '#/constants';
-import { Steps, Button, Result, Icon, InputItem, List, WingBlank } from 'antd-mobile';
+import { Toast, Steps, Button, List, WingBlank } from 'antd-mobile';
 import { CID } from 'multiformats/cid';
 import { hmac } from '#/utils/hmac';
-import { deriveKeyFromPassword } from '#/utils/kdf';
 import { AES } from '#/utils/aes';
 import { cat } from '#/utils/ipfs';
 import { setRecord } from '#/api';
 import { db, stores } from '@/stores/idb';
+import { useMobxStore } from '@/stores/mobx';
+import { useNavigate } from 'react-router-dom';
 
 const { Step } = Steps;
 
-// TODO: UI for inputting password
-const salt = crypto.getRandomValues(new Uint8Array(16));
-const password = 'P@ssw0rd';
-const { hmac: hk } = await deriveKeyFromPassword(password, salt);
-
 export default () => {
+    const navigate = useNavigate();
     const [src, setSrc] = useState('');
     const [step, setStep] = useState(0);
     const [cid, setCid] = useState();
     const [ca, setCa] = useState();
     const [sk, setSk] = useState();
     const [data, setData] = useState();
+    const store = useMobxStore();
     useEffect(() => {
         const { pk, sk } = keyGen(g);
         toDataURL([{
@@ -63,20 +61,29 @@ export default () => {
             setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
 
             setStep(2);
+            Toast.success('扫描成功');
             return true;
-        } catch {
+        } catch (e) {
+            Toast.fail(e);
             return false;
         }
     }
     const handleUpload = async () => {
-        await setRecord(await hmac(cid.bytes, hk, ''), ca.map(i => i.serializeToHexStr()));
-        await db.put(stores.record, {
-            time: new Date(data.time),
-            title: `${data.hospital} ${data.department}`,
-            description: data.diagnosis,
-            attachments: data.attachments.map(([name]) => name).join(', '),
-            sk
-        }, cid.bytes);
+        try {
+            await setRecord(await hmac(cid.bytes, await store.hk, ''), ca.map(i => i.serializeToHexStr()));
+            await db.put(stores.record, {
+                time: new Date(data.time),
+                title: `${data.hospital} ${data.department}`,
+                description: data.diagnosis,
+                attachments: data.attachments.map(([name]) => name).join(', '),
+                sk: sk.serialize()
+            }, cid.bytes);
+            Toast.success('提交成功', 1, () => {
+                navigate('/');
+            });
+        } catch (e) {
+            Toast.fail(e);
+        }
     }
     return (
         <WingBlank>
