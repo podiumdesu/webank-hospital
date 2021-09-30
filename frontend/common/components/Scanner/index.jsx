@@ -9,7 +9,7 @@ export const Scanner = ({ onData }) => {
         const video = document.createElement("video");
         const canvas = node.getContext("2d");
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        const tick = () => {
+        const tick = async () => {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 node.height = video.videoHeight / video.videoWidth * node.width;
                 canvas.drawImage(video, 0, 0, node.width, node.height);
@@ -25,7 +25,7 @@ export const Scanner = ({ onData }) => {
                     canvas.lineWidth = 4;
                     canvas.strokeStyle = "#FF3B58";
                     canvas.stroke();
-                    if (onData(new Uint8Array(binaryData))) {
+                    if (await onData(new Uint8Array(binaryData))) {
                         stream.getTracks().forEach(track => track.stop());
                         return;
                     }
