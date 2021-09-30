@@ -27,13 +27,13 @@ server.post<{ Params: { id: string }, Body: [string, string] }>('/records/:id', 
     res.send();
 });
 
-server.get<{ Params: { id: string, pk: string } }>('/records/:id/rk/:pk', async ({ params: { id, pk } }, res) => {
-    const [rk] = await web3j.call(
+server.get<{ Params: { id: string, rk: string } }>('/records/:id/rk/:rk', async ({ params: { id, rk } }, res) => {
+    const [cb] = await web3j.call(
         addresses.record,
         'function reEncrypt(string memory id, string memory rk) public view returns (string[2] memory)',
-        [id, pk],
+        [id, rk],
     );
-    res.send(rk);
+    res.send(cb);
 });
 
 server.listen(5000);
