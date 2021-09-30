@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Icon } from "antd-mobile";
 
 export const CardContainer = ({ left, right, children }) => {
@@ -11,7 +12,7 @@ export const CardContainer = ({ left, right, children }) => {
     )
 }
 
-export const RecordCard = ({ time, title, description, attachment }) => {
+export const RecordCard = ({ time, title, description, attachment, to }) => {
     return (
         <CardContainer
             left={
@@ -23,7 +24,7 @@ export const RecordCard = ({ time, title, description, attachment }) => {
             }
             right={
                 <div className='flex items-center'>
-                    <Icon type='right' className='text-6178EE' />
+                    <Link to={to}><Icon type='right' className='text-6178EE' /></Link>
                 </div>
             }
         >

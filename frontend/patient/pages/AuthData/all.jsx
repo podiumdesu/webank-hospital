@@ -3,9 +3,10 @@ import { WingBlank, Icon } from 'antd-mobile';
 import { RecordCard, CardContainer } from '@/components/RecordCard';
 import { Link } from 'react-router-dom'
 import { db, stores } from '@/stores/idb';
+import { CID } from 'multiformats/cid';
 
 const cids = await db.getAllKeys(stores.record);
-const record = await Promise.all(cids.map(async (cid) => [cid, await db.get(stores.record, cid)]));
+const record = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)]));
 
 export default () => {
     return (
@@ -24,8 +25,14 @@ export default () => {
             />
             {
                 record.map(([cid, { time, title, description, attachments }], _idx) => (
-                    <RecordCard time={time} title={title} description={description} 
-                                attachment={attachments} key={_idx}></RecordCard>
+                    <RecordCard
+                        time={time}
+                        title={title}
+                        description={description}
+                        attachment={attachments}
+                        to={`/medicalRecord/${CID.decode(cid).toString()}`}
+                        key={_idx}
+                    />
                 ))
             }
         </WingBlank>
