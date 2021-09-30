@@ -4,6 +4,9 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      fontSize: {
+        '2xs': '0.625rem',
+      },
       width: {
         'screen-1/4': '25vw',
       },
