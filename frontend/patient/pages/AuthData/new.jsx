@@ -64,7 +64,7 @@ export default () => {
             Toast.success('扫描成功');
             return true;
         } catch (e) {
-            Toast.fail(e);
+            Toast.fail(e.message);
             return false;
         }
     }
@@ -82,7 +82,7 @@ export default () => {
                 navigate('/');
             });
         } catch (e) {
-            Toast.fail(e);
+            Toast.fail(e.message);
         }
     }
     return (

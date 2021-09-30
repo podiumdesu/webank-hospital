@@ -36,7 +36,7 @@ export default () => {
                 const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
                 setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
             } catch (e) {
-                Toast.fail(e);
+                Toast.fail(e.message);
             }
         })();
     }, [cid]);
