@@ -18,6 +18,8 @@ export const {
     hashToFr,
     Fr,
     G1,
+    G2,
+    GT,
 } = mcl;
 
 export function generatorGen(g, h, fromHex = false) {
