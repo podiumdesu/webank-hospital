@@ -1,10 +1,11 @@
 import React from 'react';
 import Home from '@/pages/MainPage';
-import { useRoutes } from 'react-router-dom';
+import { useRoutes, Outlet } from 'react-router-dom';
 import loadable from '@loadable/component'
 
 const MedicalCard = loadable(() => import('@/pages/MedicalCard'));
 const MedicalRecord = loadable(() => import('@/pages/MedicalRecord'));
+const MedicalRecordDetail = loadable(() => import('@/pages/MedicalRecord/detail'));
 const ReportProgress = loadable(() => import('@/pages/ReportProgress'));
 const AuthData = loadable(() => import('@/pages/AuthData'));
 const NewAuthData = loadable(() => import('@/pages/AuthData/new'));
@@ -18,8 +19,18 @@ export const routes = [
   },
   {
     path: '/medicalRecord',
-    element: <MedicalRecord />,
-    title: '电子病历'
+    element: <Outlet />,
+    title: '电子病历',
+    children: [
+      {
+        path: ':cid',
+        element: <MedicalRecordDetail />,
+      },
+      {
+        path: '',
+        element: <MedicalRecord />,
+      }
+    ]
   },
   {
     path: '/reportProgress',
