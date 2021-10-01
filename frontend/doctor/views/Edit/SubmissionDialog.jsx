@@ -61,7 +61,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
                         <StepLabel>数据上链</StepLabel>
                         <StepContent>
                             <Typography>请让用户扫描下图所示的二维码</Typography>
-                            <Box component="img" src={result} display="block" />
+                            <Box component="img" src={result} display="block" mx='auto' />
                             <Button onClick={handleFinish}>
                                 完成
                             </Button>

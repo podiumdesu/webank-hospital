@@ -1,4 +1,4 @@
-import { Box, Button, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
+import { Box, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import { Scanner } from '#/components/Scanner';
 import React, { useEffect, useState } from 'react';
 import { Fr, GT, keyGen, reDecrypt } from '#/utils/pre';
@@ -44,30 +44,32 @@ export const Get = () => {
         }
     };
     return (
-        <Stepper activeStep={step} orientation="vertical">
-            <Step>
-                <StepLabel>申请授权</StepLabel>
-                <StepContent>
-                    <Typography>请让用户扫描下图所示的二维码</Typography>
-                    <Box component="img" src={src} display="block" />
-                    <Button onClick={() => setStep(1)}>
-                        下一步
-                    </Button>
-                </StepContent>
-            </Step>
-            <Step>
-                <StepLabel>获取数据</StepLabel>
-                <StepContent>
-                    <Typography>请扫描用户出示的二维码</Typography>
-                    <Scanner onData={handleData} />
-                </StepContent>
-            </Step>
-            <Step>
-                <StepLabel>数据展示</StepLabel>
-                <StepContent>
-                    {/* TODO */}
-                </StepContent>
-            </Step>
-        </Stepper>
+        <Paper sx={{ p: 1, m: 1, flex: 1 }}>
+            <Stepper activeStep={step} orientation="vertical">
+                <Step>
+                    <StepLabel>申请授权</StepLabel>
+                    <StepContent>
+                        <Typography>请让用户扫描下图所示的二维码</Typography>
+                        <Box component="img" src={src} display="block" mx='auto' />
+                        <Button onClick={() => setStep(1)}>
+                            下一步
+                        </Button>
+                    </StepContent>
+                </Step>
+                <Step>
+                    <StepLabel>获取数据</StepLabel>
+                    <StepContent>
+                        <Typography>请扫描用户出示的二维码</Typography>
+                        <Scanner onData={handleData} />
+                    </StepContent>
+                </Step>
+                <Step>
+                    <StepLabel>数据展示</StepLabel>
+                    <StepContent>
+                        {/* TODO */}
+                    </StepContent>
+                </Step>
+            </Stepper>
+        </Paper>
     );
 };
