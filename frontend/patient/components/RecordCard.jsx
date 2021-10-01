@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Icon } from "antd-mobile";
+import { RightOutline } from "antd-mobile-icons";
 
 export const CardContainer = ({ left, right, children }) => {
     return (
@@ -24,7 +24,7 @@ export const RecordCard = ({ time, title, description, attachment, to }) => {
             }
             right={
                 <div className='flex items-center'>
-                    <Link to={to}><Icon type='right' className='text-6178EE' /></Link>
+                    <Link to={to}><RightOutline className='text-6178EE' /></Link>
                 </div>
             }
         >

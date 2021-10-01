@@ -3,7 +3,8 @@ import { toDataURL } from 'qrcode';
 import { keyGen, G1, Fr, decrypt } from '#/utils/pre';
 import { Scanner } from '#/components/Scanner';
 import { g, h } from '#/constants';
-import { Toast, Steps, Button, List, WingBlank } from 'antd-mobile';
+import { Toast, Steps, Button, Form } from 'antd-mobile';
+import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
 import { CID } from 'multiformats/cid';
 import { hmac } from '#/utils/hmac';
 import { AES } from '#/utils/aes';
@@ -54,18 +55,23 @@ export default () => {
             }
             const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
 
-            // check whethter the file is correctly encrypted
+            // check whether the file is correctly encrypted
             const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
 
-            // display the data and wait user for approvement
+            // display the data and wait user for approval
             setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
 
-            Toast.success('扫描成功', 1, () => {
-                setStep(2);
+            Toast.show({
+                icon: <CheckOutline className='mx-auto' />,
+                content: '扫描成功',
+                afterClose: () => setStep(2),
             });
             return true;
         } catch (e) {
-            Toast.fail(e.message);
+            Toast.show({
+                icon: <CloseOutline className='mx-auto' />,
+                content: e.message,
+            });
             return false;
         }
     }
@@ -79,16 +85,23 @@ export default () => {
                 attachments: data.attachments.map(([name]) => name).join(', '),
                 sk: sk.serialize()
             }, cid.bytes);
-            Toast.success('提交成功', 1, () => {
-                navigate('/');
-            });
+            Toast.show({
+                icon: <CheckOutline className='mx-auto' />,
+                content: '提交成功',
+                afterClose: () => {
+                    navigate('/');
+                },
+            })
         } catch (e) {
-            Toast.fail(e.message);
+            Toast.show({
+                icon: <CloseOutline className='mx-auto' />,
+                content: e.message,
+            })
         }
     }
     return (
-        <WingBlank>
-            <Steps current={step} direction="horizontal" size="small">
+        <div className='px-4'>
+            <Steps current={step}>
                 <Step title='开始' />
                 <Step title='授权' />
                 <Step title='上链' />
@@ -97,29 +110,29 @@ export default () => {
                 [
                     <div className='flex flex-col items-center'>
                         <p className='font-bold text-xl'>请出示下面的二维码</p>
-                        <img src={src} />
-                        <Button type="primary" inline onClick={() => setStep(1)}>下一步</Button>
+                        <img src={src} alt='' />
+                        <Button onClick={() => setStep(1)}>下一步</Button>
                     </div>,
                     <div className='flex flex-col items-center'>
                         <p className='font-bold text-xl'>请扫描医生的二维码</p>
                         <Scanner onData={handleData} />
                     </div>,
-                    <>
-                        <List>
-                            <List.Item extra={data?.hospital}>
-                                医院
-                            </List.Item>
-                            <List.Item extra={data?.doctor}>
-                                医生
-                            </List.Item>
-                            <List.Item extra={data?.diagnosis}>
-                                诊断意见
-                            </List.Item>
-                        </List>
-                        <Button className='mt-2' type="primary" onClick={handleUpload}>数据上链</Button>
-                    </>,
+                    <Form
+                        layout='horizontal'
+                        footer={<Button className='mt-2' block onClick={handleUpload}>数据上链</Button>}
+                    >
+                        <Form.Item label='医院'>
+                            {data?.hospital}
+                        </Form.Item>
+                        <Form.Item label='医生'>
+                            {data?.doctor}
+                        </Form.Item>
+                        <Form.Item label='诊断意见'>
+                            {data?.diagnosis}
+                        </Form.Item>
+                    </Form>,
                 ][step]
             }
-        </WingBlank>
+        </div>
     )
 }

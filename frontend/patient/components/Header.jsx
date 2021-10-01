@@ -1,11 +1,7 @@
 import React from "react";
-import {
-    useLocation,
-    matchRoutes,
-    useNavigate,
-} from "react-router-dom";
+import { matchRoutes, useLocation, useNavigate } from "react-router-dom";
 import { routes } from '@/routes';
-import { NavBar, Icon } from 'antd-mobile'
+import { NavBar } from 'antd-mobile';
 
 export const Header = () => {
     const location = useLocation();
@@ -13,14 +9,10 @@ export const Header = () => {
     const [{ route: { title }, pathname }] = matchRoutes(routes, location);
     return (
         <NavBar
-            mode="light"
-            icon={pathname === '/' ? undefined : <Icon
-                type="left"
-                onClick={() => {
-                    navigate(history.length > 1 ? -1 : `${location.pathname}/../`);
-                }}
-                className='text-black'
-            />}
+            back={pathname !== '/' ? undefined : null}
+            onBack={() => {
+                navigate(history.length > 1 ? -1 : `${location.pathname}/../`);
+            }}
         >
             {title}
         </NavBar>

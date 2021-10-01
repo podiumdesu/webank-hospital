@@ -1,5 +1,4 @@
 import React from 'react'
-import { WingBlank } from 'antd-mobile'
 import { RecordCard } from '@/components/RecordCard'
 import { db, stores } from '@/stores/idb';
 import { CID } from 'multiformats/cid';
@@ -9,7 +8,7 @@ const record = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), a
 
 export default () => {
     return (
-        <WingBlank>
+        <div className='px-4'>
             {
                 record.map(([cid, { time, title, description, attachments }], _idx) => (
                     <RecordCard
@@ -22,6 +21,6 @@ export default () => {
                     />
                 ))
             }
-        </WingBlank>
+        </div>
     )
 }

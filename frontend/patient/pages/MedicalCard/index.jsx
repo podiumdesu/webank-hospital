@@ -3,7 +3,6 @@ import blueFlower from '../../images/icon/common/blueFlower.png'
 import cardBg from '../../images/medicalCard/cardBg.png'
 import allCategoryJSON from '@/config/category.json'
 import QRCode from 'qrcode';
-import { WingBlank } from 'antd-mobile';
 import { Section } from '@/components/Section'
 
 const modules = Object.assign(
@@ -41,7 +40,7 @@ class App extends React.Component {
     }
     render() {
         return (
-            <WingBlank>
+            <div className='px-4'>
                 <div className='relative mx-1 mb-8'>
                     <div className='absolute top-5 left-6'>
                         <p className='leading-8 text-base font-semibold mb-1'>李小红</p>
@@ -51,14 +50,14 @@ class App extends React.Component {
                         <p className='text-xs mt-5 w-24 text-center leading-5 rounded-2xl bg-[#61A1F8] text-[#3C55D5]'>⇆ 切换就诊人</p>
                     </div>
                     <p className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 px-3 z-20 text-xs text-dark-black bg-[#FBCD6F]'>自费卡</p>
-                    <img src={cardBg} className='w-full opacity-50' />
+                    <img src={cardBg} className='w-full opacity-50' alt='' />
                     <div className='absolute right-6 top-10'>
-                        <img className='w-screen-1/4 h-w-screen-1/4' src={qrCode} />
+                        <img className='w-screen-1/4 h-w-screen-1/4' src={qrCode} alt='' />
                         <p className='text-xs text-center pt-1 text-dark-black'>点击出示二维码</p>
                     </div>
                 </div>
                 <Section icon={blueFlower} title='就诊功能' items={this.state.iconData} />
-            </WingBlank>
+            </div>
         )
 
     }

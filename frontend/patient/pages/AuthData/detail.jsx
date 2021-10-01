@@ -6,6 +6,7 @@ import { Fr, G2, GT, reKeyGen } from '#/utils/pre';
 import { Scanner } from '#/components/Scanner';
 import { toDataURL } from 'qrcode';
 import { Button, Steps, Toast } from 'antd-mobile';
+import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
 import { reEncrypt } from '#/api';
 import { hmac } from '#/utils/hmac';
 import { useMobxStore } from '@/stores/mobx';
@@ -34,18 +35,23 @@ export default () => {
                 data: [...bytes, ...cb[0].serialize(), ...cb[1].serialize()],
                 mode: 'byte'
             }]));
-            Toast.success('扫描成功', 1, () => {
-                setStep(1);
+            Toast.show({
+                icon: <CheckOutline className='mx-auto' />,
+                content: '扫描成功',
+                afterClose: () => setStep(1),
             });
             return true;
         } catch (e) {
-            Toast.fail(e.message);
+            Toast.show({
+                icon: <CloseOutline className='mx-auto'/>,
+                content: e.message,
+            });
             return false;
         }
     };
     return (
-        <div className="flex-1 bg-[#C8DBFF33]">
-            <Steps current={step} direction="horizontal" size="small">
+        <div className="px-4">
+            <Steps current={step}>
                 <Step title="开始" />
                 <Step title="授权" />
             </Steps>
@@ -57,9 +63,9 @@ export default () => {
                     </div>,
                     <div className="flex flex-col items-center">
                         <p className="font-bold text-xl">请出示下面的二维码</p>
-                        <img src={src} />
-                        <Button type="primary" inline onClick={() => navigate('/')}>完成</Button>
-                    </div>,
+                        <img src={src} alt='' />
+                        <Button onClick={() => navigate('/')}>完成</Button>
+                    </div>
                 ][step]
             }
         </div>

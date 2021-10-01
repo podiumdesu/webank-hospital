@@ -1,5 +1,5 @@
 import React from 'react';
-import { WingBlank, Icon } from 'antd-mobile';
+import { AddOutline } from 'antd-mobile-icons';
 import { RecordCard, CardContainer } from '@/components/RecordCard';
 import { Link } from 'react-router-dom'
 import { db, stores } from '@/stores/idb';
@@ -10,16 +10,16 @@ const record = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), a
 
 export default () => {
     return (
-        <WingBlank>
+        <div className='px-4'>
             <CardContainer
                 left={
                     <div className='flex-1'>
-                        <p className='text-dark-black font-bold'>新病历</p>
+                        <p className='text-dark-black font-semibold text-base'>新病历</p>
                     </div>
                 }
                 right={
                     <div className='flex items-center'>
-                        <Link to='new'><Icon type='cross' className='text-6178EE rotate-45' /></Link>
+                        <Link to='new'><AddOutline className='text-6178EE' /></Link>
                     </div>
                 }
             />
@@ -35,6 +35,6 @@ export default () => {
                     />
                 ))
             }
-        </WingBlank>
+        </div>
     )
 }

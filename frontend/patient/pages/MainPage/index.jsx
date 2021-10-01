@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Carousel, Flex, WingBlank } from 'antd-mobile';
+import { Swiper } from 'antd-mobile';
 import './index.css'
 import categoryJSON from '@/config/category.json'
 import { Section, SectionBody } from '@/components/Section';
@@ -58,62 +58,41 @@ const carouselData = await Promise.all(['covidTest', 'covidMask', 'covidVacci'].
 }))
 
 class App extends React.Component {
-  state = {
-    imgHeight: 176,
-  }
-
   render() {
     return (
       <>
-        <WingBlank>
-          <Carousel
-            autoplay
-            infinite
-          >
+        <div className='px-4'>
+          <Swiper autoplay indicatorProps={{ color: 'white' }}>
             {carouselData.map(val => (
-              <a
-                key={val}
-                href='/'
-                className='w-full inline-block'
-                style={{ height: this.state.imgHeight }}
-              >
-                <img
-                  src={val}
-                  alt=''
-                  className='w-full'
-                  onLoad={() => {
-                    // fire window resize event to change height
-                    window.dispatchEvent(new Event('resize'));
-                    this.setState({ imgHeight: 'auto' });
-                  }}
-                />
-              </a>
+              <Swiper.Item key={val}>
+                <img src={val} alt='' />
+              </Swiper.Item>
             ))}
-          </Carousel>
-          <Flex className='mb-6 mt-3'>
+          </Swiper>
+          <div className='grid grid-cols-2 gap-2 mb-6 mt-3'>
             {grid2data.map((dataItem, i) => (
-              <Flex.Item key={i} className='relative'>
-                <img src={dataItem.bg} className='w-full' />
+              <div key={i} className='relative'>
+                <img src={dataItem.bg} className='w-full' alt='' />
                 <div className='absolute flex flex-col justify-center items-center w-full h-full top-0'>
                   <p className='flex justify-center items-center gap-1.5'>
-                    <img className='w-4' src={dataItem.icon}></img>
+                    <img className="w-4" src={dataItem.icon} alt='' />
                     <span className='font-bold text-white text-base'>{dataItem.text}</span>
                   </p>
                   <Link className='text-xs' to={`/${dataItem.category}`} style={{ color: `${dataItem.textColor}` }}>{dataItem.clickText}</Link>
                 </div>
-              </Flex.Item>
+              </div>
             ))}
-          </Flex>
+          </div>
           <SectionBody items={mainItems} />
-        </WingBlank>
+        </div>
         <div className='h-1 opacity-25 bg-[#C8DBFF]' />
-        <WingBlank>
+        <div className='px-4'>
           <Section title='其他功能' items={otherItems} icon={blueFlower} />
-        </WingBlank>
+        </div>
         <div className='h-1 opacity-25 bg-[#C8DBFF]' />
-        <WingBlank>
+        <div className='px-4'>
           <Section title='个人中心' items={personalItems} icon={person} />
-        </WingBlank>
+        </div>
       </>
     );
   }

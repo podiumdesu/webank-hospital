@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Toast, WingBlank } from 'antd-mobile';
+import { Toast } from 'antd-mobile';
+import { CloseOutline } from 'antd-mobile-icons';
 import { useParams } from 'react-router-dom';
 import magnifier from '@/images/medicalRecord/magnifier.png';
 import pill from '@/images/medicalRecord/pill.png';
@@ -36,13 +37,16 @@ export default () => {
                 const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
                 setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
             } catch (e) {
-                Toast.fail(e.message);
+                Toast.show({
+                    icon: <CloseOutline className='mx-auto' />,
+                    content: e.message,
+                })
             }
         })();
     }, [cid]);
     return (
         <div className="flex-1 bg-[#C8DBFF33]">
-            {data ? <WingBlank className="flex flex-col gap-5 py-4">
+            {data ? <div className="flex flex-col gap-5 p-4">
                 <div className="bg-white w-full p-4 rounded-xl">
                     <div className="flex justify-between text-[#60A2F8]">
                         <div className="flex flex-col justify-between">
@@ -78,7 +82,7 @@ export default () => {
                 </div>
                 <div>
                     <p className="text-lg font-bold text-dark-black mb-2">
-                        <img src={pill} className="inline h-4 mx-1 align-middle" />
+                        <img src={pill} className="inline h-4 mx-1 align-middle" alt='' />
                         西药处方
                     </p>
                     <div className="grid grid-cols-2 gap-3">
@@ -95,7 +99,7 @@ export default () => {
                 </div>
                 <div>
                     <p className="text-lg font-bold text-dark-black mb-2">
-                        <img src={magnifier} className="inline h-4 mx-1 align-middle" />
+                        <img src={magnifier} className="inline h-4 mx-1 align-middle" alt='' />
                         辅助检查
                     </p>
                     <div className="bg-white w-full p-4 rounded-xl flex flex-col gap-1">
@@ -110,7 +114,7 @@ export default () => {
                         <p className="text-2xs text-[#3C55D5] mt-3">是否支持下载报告？</p>
                     </div>
                 </div>
-            </WingBlank> : null}
+            </div> : null}
         </div>
     );
 };
