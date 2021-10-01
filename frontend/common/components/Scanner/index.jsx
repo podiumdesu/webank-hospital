@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import jsQR from 'jsqr';
 
 export const Scanner = ({ onData }) => {
+    const [stream, setStream] = useState();
     const ref = useCallback(async (node) => {
         if (!node) {
             return;
@@ -9,6 +10,7 @@ export const Scanner = ({ onData }) => {
         const video = document.createElement("video");
         const canvas = node.getContext("2d");
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        setStream(stream);
         const tick = async () => {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 node.height = video.videoHeight / video.videoWidth * node.width;
@@ -37,5 +39,6 @@ export const Scanner = ({ onData }) => {
         video.play();
         requestAnimationFrame(tick);
     }, []);
+    useEffect(() => () => stream?.getTracks()?.forEach(track => track.stop()), [stream]);
     return <canvas ref={ref} height={0} style={{ display: 'block', width: '100%' }} />;
 };
