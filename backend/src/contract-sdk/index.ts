@@ -7,10 +7,10 @@ import { getSignDeployTx, getSignTx } from './web3sync';
 const QUERY = MESSAGE_TYPE.QUERY;
 const TRANSACTION = MESSAGE_TYPE.CHANNEL_RPC_REQUEST;
 
-const blockHeightRecords = new Map();
+const blockHeightRecords = new Map<number, number>();
 
 function updateBlockHeight(groupID: number, blockHeight: number) {
-    if (!blockHeightRecords.has(groupID) || blockHeight > blockHeightRecords.get(groupID)) {
+    if (!blockHeightRecords.has(groupID) || blockHeight > blockHeightRecords.get(groupID)!) {
         blockHeightRecords.set(groupID, blockHeight);
     }
 }
@@ -21,10 +21,10 @@ export class Web3jService {
 
     _constructRequest<T>(method: string, params: unknown[], type = QUERY) {
         return channelPromise<T>({
-            'jsonrpc': '2.0',
+            jsonrpc: '2.0',
             method,
             params,
-            'id': 1
+            id: 1
         }, type, this.config.nodes[~~(Math.random() * this.config.nodes.length)], this.config.authentication, this.config.timeout);
     }
 
@@ -32,7 +32,7 @@ export class Web3jService {
         const { groupID, nodes, authentication } = this.config;
 
         if (!blockHeightRecords.has(groupID)) {
-            const blockHeight: any = await this.getBlockNumber();
+            const blockHeight = await this.getBlockNumber();
             blockHeightRecords.set(groupID, parseInt(blockHeight.result, 16));
             // send block notify registration to all known nodes to get an accurate block height
             for (const node of nodes) {
@@ -44,7 +44,9 @@ export class Web3jService {
     }
 
     getBlockNumber() {
-        return this._constructRequest('getBlockNumber', [this.config.groupID]);
+        return this._constructRequest<{
+            result: string,
+        }>('getBlockNumber', [this.config.groupID]);
     }
 
     getPbftView() {
@@ -92,7 +94,12 @@ export class Web3jService {
     }
 
     getBlockByNumber(blockNumber: string, includeTransactions: boolean) {
-        return this._constructRequest('getBlockByNumber', [this.config.groupID, blockNumber, includeTransactions]);
+        return this._constructRequest<{
+            result: {
+                timestamp: string;
+                hash: string;
+            }
+        }>('getBlockByNumber', [this.config.groupID, blockNumber, includeTransactions]);
     }
 
     getBlockHashByNumber(blockNumber: string) {
@@ -145,7 +152,7 @@ export class Web3jService {
 
         const blockNumber = await this.getBlockHeight();
         const txData = `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`;
-        const signTx = this._rawTransaction(to, txData, blockNumber + 500);
+        const signTx = this._rawTransaction(to, txData, blockNumber! + 500);
         const { status, statusMsg, output } = await this._constructRequest<{
             status: string;
             statusMsg: string;
@@ -163,13 +170,12 @@ export class Web3jService {
         const inputs = contractAbi.deploy.inputs;
         assert(inputs.length === parameters.length);
 
-        let contractBin = bin;
-        if (parameters.length) {
-            contractBin += contractAbi._encodeParams(inputs, parameters);
-        }
+        const paramsBin = contractAbi._encodeParams(inputs, parameters);
 
         const blockNumber = await this.getBlockHeight();
-        const signTx = getSignDeployTx(this.config, contractBin, blockNumber + 500);
+        const signTx = bin.startsWith('0061736d')
+            ? getSignDeployTx(this.config, bin, blockNumber! + 500, paramsBin)
+            : getSignDeployTx(this.config, bin + paramsBin.slice(2), blockNumber! + 500);
         return this._constructRequest<{ contractAddress: string }>('sendRawTransaction', [this.config.groupID, signTx], TRANSACTION);
     }
 

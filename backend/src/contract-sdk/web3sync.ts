@@ -26,7 +26,8 @@ export function getSignTx(
 export function getSignDeployTx(
     { groupID, account: { address, privateKey }, chainID }: Configuration,
     bin: string,
-    blockLimit: number
+    blockLimit: number,
+    extraData = '0x0',
 ) {
     const tx = new Transaction({
         data: bin.startsWith('0x') ? bin : ('0x' + bin),
@@ -36,7 +37,7 @@ export function getSignDeployTx(
         blockLimit,
         chainId: chainID,
         groupId: groupID,
-        extraData: '0x0'
+        extraData
     });
     tx.sign(Buffer.from(privateKey, 'hex'));
     return tx.serialize();
