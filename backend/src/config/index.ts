@@ -77,5 +77,7 @@ hqVrevrZykI9JUHk277cWf7h
 });
 
 export const addresses = {
-    record: '0x5fb20594baf0559145d6ae1ab6d4c636b53a9367',
+    record: '0x9cb6ae3860995b076920ef1eb8f5ccea8795cbcb',
+    meta: '0xca22a148c68be6c78337cfdb3011b9f0c4b08e97',
+    trace: '0xadc44d3d2c2e02611a0d522662ec95fa51ed017c',
 };

@@ -39,4 +39,34 @@ server.get<{ Params: { id: string, rk: string } }>('/records/:id/rk/:rk', async 
     res.send(cb);
 });
 
+server.get('/status/hash', async (_, res) => {
+    const height = await web3j.getBlockHeight();
+    const { result: { hash } } = await web3j.getBlockByNumber(height!.toString(), false);
+    res.send(hash.slice(2));
+});
+
+server.get<{ Params: { id: string } }>('/traces/:id', async ({ params: { id } }, res) => {
+    const [length] = await web3j.call(
+        addresses.trace,
+        'function get_trace_length(string memory id) public view returns (uint32)',
+        [id],
+    );
+    res.send(await Promise.all([...new Array(length).keys()].map(async (i) => {
+        const [item] = await web3j.call(
+            addresses.trace,
+            'function get_trace_item(string memory id, uint32 index) public view returns (string memory id)',
+            [id, i],
+        );
+        return item;
+    })));
+});
+
+server.post<{ Params: { id: string }, Body: { c: string, proof: string } }>('/traces/:id', async ({ params: { id }, body: { c, proof } }, res) => {
+    res.send(await web3j.sendRawTransaction(
+        addresses.trace,
+        'function set(string memory id, string memory c, string memory proof) public',
+        [id, c, proof],
+    ));
+});
+
 server.listen(5000);
