@@ -6,7 +6,6 @@ use liquid_lang as liquid;
 #[liquid::interface(name = "PRE")]
 mod pre {
     extern "solidity" {
-        fn generatorGen(&self, g: String, h: String) -> (String, String);
         fn reEncrypt(&self, ca1: String, rk: String) -> String;
     }
 }
@@ -20,7 +19,6 @@ mod medical_record {
         keys: storage::Mapping<String, [String; 2]>,
     }
 
-    /// Defines the methods of your contract.
     #[liquid(methods)]
     impl MedicalRecord {
         pub fn new(&mut self) {

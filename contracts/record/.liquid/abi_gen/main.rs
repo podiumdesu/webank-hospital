@@ -22,6 +22,6 @@ fn main() -> Result<(), std::io::Error> {
     let contents = final_abi.join(",");
     let contents = format!("[{}]", contents);
     std::fs::create_dir("target").ok();
-    std::fs::write("target/ddd.abi", contents)?;
+    std::fs::write("target/contract.abi", contents)?;
     Ok(())
 }
