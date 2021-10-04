@@ -15,12 +15,6 @@ pub fn is_zero<E: FieldElement>(a: E) -> E {
     a
 }
 
-/// Return zero when a == one, and one when a == zero;
-/// assumes that a is a binary value.
-pub fn not<E: FieldElement>(a: E) -> E {
-    E::ONE - a
-}
-
 // TRAIT TO SIMPLIFY CONSTRAINT AGGREGATION
 // ================================================================================================
 

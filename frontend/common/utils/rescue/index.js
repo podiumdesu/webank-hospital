@@ -18,7 +18,7 @@ function copyStringFromMemory(start) {
     let end = start;
     while (memory[end++]) { }
 
-    const str = utf8Decoder.decode(memory.slice(start, end));
+    const str = utf8Decoder.decode(memory.slice(start, end - 1));
     dealloc_str(start);
     return str;
 }
@@ -47,15 +47,28 @@ function copyStringToMemory(str) {
     return ptr;
 }
 
-const ROUNDS = 128;
-
-export const hash = (value, seed) => copyBufferFromMemory(
-    _hash(copyBufferToMemory(value), copyBufferToMemory(seed), ROUNDS),
+export const hash = (r0, r1) => copyBufferFromMemory(
+    _hash(copyBufferToMemory(r0), copyBufferToMemory(r1)),
     32
 );
 
-export const prove = (value, seed, digest) => copyStringFromMemory(
-    _prove(copyBufferToMemory(value), copyBufferToMemory(seed), copyBufferToMemory(digest), ROUNDS)
+export const prove = (r0, r1, digest) => copyStringFromMemory(
+    _prove(copyBufferToMemory(r0), copyBufferToMemory(r1), copyBufferToMemory(digest))
 );
 
-export const verify = (seed, digest, proof) => !!_verify(copyBufferToMemory(seed), copyBufferToMemory(digest), copyStringToMemory(proof));
+export const verify = (r1, digest, proof) => !!_verify(copyBufferToMemory(r1), copyBufferToMemory(digest), copyStringToMemory(proof));
+
+/*
+const id = hash(new Uint8Array(32).fill(0), new Uint8Array(32).fill(1));
+console.log(uint8ArrayToHex(id));
+const { data } = await getBlockHash();
+console.log(data);
+const now = hexToUint8Array(data)
+const digest = hash(id, now);
+console.log(uint8ArrayToHex(digest));
+const proof = prove(new Uint8Array(32).fill(1), now, digest);
+console.log(proof);
+console.log(verify(now, digest, proof));
+await setTrace(uint8ArrayToHex(id), '123456', proof);
+console.log(await getTrace(uint8ArrayToHex(id)));
+*/
