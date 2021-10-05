@@ -3,6 +3,7 @@ import cors from 'fastify-cors';
 
 import { clientConfig, addresses } from './config';
 import { Web3jService } from './contract-sdk';
+import { channelPromise, MESSAGE_TYPE } from './contract-sdk/network';
 
 const web3j = new Web3jService(clientConfig);
 const server = fastify({
@@ -66,6 +67,18 @@ server.post<{ Params: { id: string }, Body: { c: string, proof: string } }>('/tr
         addresses.trace,
         'function set(string memory id, string memory c, string memory proof) public',
         [id, c, proof],
+    ));
+});
+
+const { nodes, authentication, timeout } = clientConfig;
+
+server.post<{ Body: { method: string, params: unknown[], isQuery: boolean } }>('/rpc', async ({ body: { method, params, isQuery } }, res) => {
+    res.send(await channelPromise(
+        { jsonrpc: '2.0', method, params, id: 1 },
+        isQuery ? MESSAGE_TYPE.QUERY : MESSAGE_TYPE.CHANNEL_RPC_REQUEST,
+        nodes[~~(Math.random() * nodes.length)],
+        authentication,
+        timeout
     ));
 });
 
