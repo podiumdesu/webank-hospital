@@ -1,9 +1,10 @@
 import React from 'react'
 import blueFlower from '../../images/icon/common/blueFlower.png'
-import cardBg from '../../images/medicalCard/cardBg.png'
+import cardBg from '../../images/medicalCard/cardBg.png';
+import qr from '../../images/medicalCard/qr.svg';
 import allCategoryJSON from '@/config/category.json'
-import QRCode from 'qrcode';
-import { Section } from '@/components/Section'
+import { Section } from '@/components/Section';
+import { Link } from 'react-router-dom';
 
 const modules = Object.assign(
     import.meta.glob('../../images/icon/*.png')
@@ -23,21 +24,15 @@ await Promise.all((selectIcon).map(async i => {
     categoryIcon[i] = (await modules[`../../images/icon/${i}.png`]()).default
 }))
 
-const qrCode = await QRCode.toDataURL('2342425325231');
-
 class App extends React.Component {
     state = {
-        iconData: []
+        iconData: selectIcon.map(i => ({
+            icon: categoryIcon[i],
+            text: allCategoryJSON[i],
+            category: i
+        }))
     }
-    async componentDidMount() {
-        this.setState({
-            iconData: selectIcon.map(i => ({
-                icon: categoryIcon[i],
-                text: allCategoryJSON[i],
-                category: i
-            }))
-        })
-    }
+
     render() {
         return (
             <div className='px-4'>
@@ -52,8 +47,8 @@ class App extends React.Component {
                     <p className='absolute top-0 right-0 rounded-bl-lg rounded-tr-lg p-1 px-3 z-20 text-xs text-dark-black bg-[#FBCD6F]'>自费卡</p>
                     <img src={cardBg} className='w-full opacity-50' alt='' />
                     <div className='absolute right-6 top-10'>
-                        <img className='w-screen-1/4 h-w-screen-1/4' src={qrCode} alt='' />
-                        <p className='text-xs text-center pt-1 text-dark-black'>点击出示二维码</p>
+                        <Link to='/authData/new'><img className='w-screen-1/4 h-w-screen-1/4' src={qr} alt='' /></Link>
+                        <p className='text-xs text-center pt-1'>点击出示二维码</p>
                     </div>
                 </div>
                 <Section icon={blueFlower} title='就诊功能' items={this.state.iconData} />
