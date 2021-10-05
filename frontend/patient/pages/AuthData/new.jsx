@@ -9,7 +9,7 @@ import { CID } from 'multiformats/cid';
 import { hmac } from '#/utils/hmac';
 import { AES } from '#/utils/aes';
 import { cat } from '#/utils/ipfs';
-import { setRecord } from '#/api';
+import { setRecord } from '#/api/v2';
 import { db, stores } from '@/stores/idb';
 import { useMobxStore } from '@/stores/mobx';
 import { useNavigate } from 'react-router-dom';

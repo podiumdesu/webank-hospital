@@ -7,7 +7,7 @@ import pill from '@/images/medicalRecord/pill.png';
 import { CID } from 'multiformats/cid';
 import { cat } from '#/utils/ipfs';
 import { db, stores } from '@/stores/idb';
-import { getRecord } from '#/api';
+import { getRecord } from '#/api/v2';
 import { hmac } from '#/utils/hmac';
 import { useMobxStore } from '@/stores/mobx';
 import { decrypt, Fr, G1 } from '#/utils/pre';
@@ -22,10 +22,10 @@ export default () => {
         (async () => {
             try {
                 const bytes = CID.parse(cid).bytes;
-                const { data } = await getRecord(await hmac(bytes, await store.hk, ''));
+                const [ca0, ca1] = await getRecord(await hmac(bytes, await store.hk, ''));
                 const ca = [new Fr(), new G1()];
-                ca[0].deserializeHexStr(data[0]);
-                ca[1].deserializeHexStr(data[1]);
+                ca[0].deserializeHexStr(ca0);
+                ca[1].deserializeHexStr(ca1);
                 const sk = new Fr();
                 sk.deserialize((await db.get(stores.record, bytes)).sk);
                 const dk = decrypt(ca, sk, h);

@@ -7,7 +7,7 @@ import { Scanner } from '#/components/Scanner';
 import { toDataURL } from 'qrcode';
 import { Button, Steps, Toast } from 'antd-mobile';
 import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
-import { reEncrypt } from '#/api';
+import { reEncrypt } from '#/api/v2';
 import { hmac } from '#/utils/hmac';
 import { useMobxStore } from '@/stores/mobx';
 
@@ -27,10 +27,10 @@ export default () => {
             const pk = new G2();
             pk.deserialize(buffer);
             const rk = reKeyGen(sk, pk);
-            const { data } = await reEncrypt(await hmac(bytes, await store.hk, ''), rk.serializeToHexStr());
+            const [cb0, cb1] = await reEncrypt(await hmac(bytes, await store.hk, ''), rk.serializeToHexStr());
             const cb = [new Fr(), new GT()];
-            cb[0].deserializeHexStr(data[0]);
-            cb[1].deserializeHexStr(data[1]);
+            cb[0].deserializeHexStr(cb0);
+            cb[1].deserializeHexStr(cb1);
             setSrc(await toDataURL([{
                 data: [...bytes, ...cb[0].serialize(), ...cb[1].serialize()],
                 mode: 'byte'
