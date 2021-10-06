@@ -284,7 +284,7 @@ export const setRecord = async (id, ca) => {
 export const reEncrypt = async (id, rk) => {
     const [cb] = await service.call(
         addresses.record,
-        'function reEncrypt(string memory id, string memory rk) public view returns (string[2] memory)',
+        'function re_encrypt(string memory id, string memory rk) public view returns (string[2] memory)',
         [id, rk],
     );
     return cb;

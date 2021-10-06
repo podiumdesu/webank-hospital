@@ -34,7 +34,7 @@ server.post<{ Params: { id: string }, Body: [string, string] }>('/records/:id', 
 server.get<{ Params: { id: string, rk: string } }>('/records/:id/rk/:rk', async ({ params: { id, rk } }, res) => {
     const [cb] = await web3j.call(
         addresses.record,
-        'function reEncrypt(string memory id, string memory rk) public view returns (string[2] memory)',
+        'function re_encrypt(string memory id, string memory rk) public view returns (string[2] memory)',
         [id, rk],
     );
     res.send(cb);
