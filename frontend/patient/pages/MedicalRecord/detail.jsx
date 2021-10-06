@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Toast } from 'antd-mobile';
 import { CloseOutline } from 'antd-mobile-icons';
 import { useParams } from 'react-router-dom';
-import magnifier from '@/images/medicalRecord/magnifier.png';
-import pill from '@/images/medicalRecord/pill.png';
+
 import { CID } from 'multiformats/cid';
 import { cat } from '#/utils/ipfs';
 import { db, stores } from '@/stores/idb';
@@ -13,6 +12,23 @@ import { useMobxStore } from '@/stores/mobx';
 import { decrypt, Fr, G1 } from '#/utils/pre';
 import { h } from '#/constants';
 import { AES } from '#/utils/aes';
+
+import magnifier from '@/images/medicalRecord/magnifier.png';
+import pill from '@/images/medicalRecord/pill.png';
+import banlangen from '@/images/medicineImg/banlangen.png';
+import dy35 from '@/images/medicineImg/dy35.png';
+import lianhua from '@/images/medicineImg/lianhua.png';
+import toubao from '@/images/medicineImg/toubao.png';
+import nacl from '@/iamges/medicineImg/nacl.png'
+
+const medicineImg = {
+    "板蓝根": banlangen,
+    "达英35": dy35,
+    "莲花清瘟": lianhua,
+    "头孢": toubao,
+    "生理盐水": nacl,
+    "氯化钠": nacl
+}
 
 export default () => {
     const { cid } = useParams();
@@ -88,7 +104,9 @@ export default () => {
                     <div className="grid grid-cols-2 gap-3">
                         {data.drugs.map(([name, code], index) => (
                             <div key={index}>
-                                <div className="bg-white h-24 rounded-t-xl">{/*TODO*/}</div>
+                                <div className="bg-white h-24 rounded-t-xl flex justify-center py-1">
+                                    <img className="h-full" src={medicineImg[name] ? medicineImg[name] : ""} alt=""/>
+                                </div>
                                 <div className="rounded-b-xl py-2 text-center bg-[#AFD0FB] text-dark-black">
                                     <p className="font-bold text-xs">{name}</p>
                                     <p className="font-medium text-2xs">溯源码: {code}</p>
@@ -111,7 +129,6 @@ export default () => {
                                 }}>点击下载</span>
                             </div>
                         ))}
-                        <p className="text-2xs text-[#3C55D5] mt-3">是否支持下载报告？</p>
                     </div>
                 </div>
             </div> : null}
