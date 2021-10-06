@@ -11,6 +11,7 @@ const record = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), a
 export default () => {
     return (
         <div className='px-4'>
+            {/*
             <CardContainer
                 left={
                     <div className='flex-1'>
@@ -23,6 +24,7 @@ export default () => {
                     </div>
                 }
             />
+            */}
             {
                 record.map(([cid, { time, title, description, attachments }], _idx) => (
                     <RecordCard
