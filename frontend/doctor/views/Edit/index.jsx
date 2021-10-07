@@ -6,8 +6,10 @@ import { Basic } from './Basic';
 import { Prescription } from './Prescription';
 import { Examination } from './Examination';
 import { SubmissionDialog } from './SubmissionDialog';
+import { clientConfig } from '$/config';
 
 const getDefaultValue = () => ({
+    address: clientConfig.address,
     hospital: '宝钢医院',
     department: '呼吸科',
     doctor: '刘伟',
@@ -26,7 +28,7 @@ const getDefaultValue = () => ({
 export const Edit = () => {
     const [drugs, setDrugs] = useState([]);
     const [attachments, setAttachments] = useState([]);
-    const [data, setData] = useState('');
+    const [data, setData] = useState(undefined);
     const {
         control,
         formState: { isValid },
@@ -38,11 +40,11 @@ export const Edit = () => {
     });
     const onSubmit = (data) => {
         data.age = +data.age;
-        setData(JSON.stringify({ ...data, drugs, attachments }));
+        setData({ ...data, drugs, attachments });
     };
     const onFinish = () => {
         reset(getDefaultValue());
-        setData('');
+        setData(undefined);
         setDrugs([]);
         setAttachments([]);
     };

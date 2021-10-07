@@ -11,6 +11,7 @@ export const Basic = ({ onSubmit, control, isValid }) => {
             <Typography variant="h4" gutterBottom>基本信息</Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={2}>
+                <Input name="address" label="地址" control={control} disabled />
                 <Stack direction="row" spacing={1}>
                     <Input name="hospital" label="医院" control={control} sx={{ flex: 2 }} disabled />
                     <Input name="department" label="科室" control={control} sx={{ flex: 2 }} disabled />
@@ -18,9 +19,9 @@ export const Basic = ({ onSubmit, control, isValid }) => {
                 </Stack>
                 <Input name="number" label="单号" control={control} disabled />
                 <Stack direction="row" spacing={1}>
-                    <Input name="name" label="姓名" control={control} />
-                    <Input name="gender" label="性别" control={control} />
-                    <Input name="age" label="年龄" control={control} type="number" inputProps={{
+                    <Input name="name" label="姓名" control={control} sx={{ flex: 2 }} />
+                    <Input name="gender" label="性别" control={control} sx={{ flex: 1 }} />
+                    <Input name="age" label="年龄" control={control} type="number" sx={{ flex: 1 }} inputProps={{
                         min: 0,
                         max: 100
                     }} />

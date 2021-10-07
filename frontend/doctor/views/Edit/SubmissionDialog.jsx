@@ -6,6 +6,10 @@ import { g, h } from '#/constants';
 import { toDataURL } from 'qrcode';
 import { Box, Button, Dialog, DialogContent, DialogTitle, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import { Scanner } from '#/components/Scanner';
+import { keccak_256 } from 'js-sha3';
+import { ecdsaSign } from 'secp256k1';
+import { clientConfig } from '$/config';
+import { uint8ArrayToHex } from '#/utils/codec';
 
 export const SubmissionDialog = ({ open, data, onFinish }) => {
     const [pk, setPK] = useState('');
@@ -25,7 +29,13 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
     const handleUpload = async () => {
         const dk = randomGen();
         const aes = new AES(await AES.convertKey(dk));
-        const { cid } = await add(new Blob([aes.iv, await aes.encrypt(data, 'utf-8', '')]));
+        const { signature, recid } = ecdsaSign(new Uint8Array(keccak_256.update(JSON.stringify(data)).arrayBuffer()), clientConfig.privateKey);
+        const c = await aes.encrypt(JSON.stringify({
+            data,
+            signature: uint8ArrayToHex(signature),
+            recid,
+        }), 'utf-8', '');
+        const { cid } = await add(new Blob([aes.iv, c]));
         const [ca0, ca1] = encrypt(dk, pk, g, h);
         setResult(await toDataURL([{
             data: [...cid.bytes, ...ca0.serialize(), ...ca1.serialize()],
