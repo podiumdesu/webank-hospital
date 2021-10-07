@@ -1,14 +1,6 @@
 import { Configuration } from '../contract-sdk/config';
 
-export const clientConfig = new Configuration({
-    account: {
-        privateKey: `-----BEGIN PRIVATE KEY-----
-MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgdEYQ++b92Q+eTN/D4/2v
-PR1ri1CEjfTL06BzAaJ1WyqhRANCAAQW8jupmvxX2sZn+2/JRMA+gKDSDazkFPri
-KFoYwnafD758K/zixqN/IU816YZf3AqGvFwQIanOElQIpI0uGM8U
------END PRIVATE KEY-----`,
-        address: '0x440bc044b9dac7b0f2aadc735d62b7c7f851d053',
-    },
+export const baseConfig = {
     nodes: [
         {
             ip: "18.219.192.167",
@@ -74,10 +66,16 @@ u7ESCxVBJhQKAaYHe+TU4OC32rqyo1W6Fl/IP/bhvwIhAJVGSRKO9aOYZeU4Qi5A
 hqVrevrZykI9JUHk277cWf7h
 -----END CERTIFICATE-----`
     },
+}
+
+export const clientConfig = new Configuration({
+    ...baseConfig,
+    privateKey: Buffer.from(`744610fbe6fdd90f9e4cdfc3e3fdaf3d1d6b8b50848df4cbd3a07301a2755b2a`, 'hex'),
 });
 
 export const addresses = {
-    record: '0x9cb6ae3860995b076920ef1eb8f5ccea8795cbcb',
-    meta: '0xca22a148c68be6c78337cfdb3011b9f0c4b08e97',
-    trace: '0xadc44d3d2c2e02611a0d522662ec95fa51ed017c',
+    ca: '0xaaa6e5180433ab684dbf5e87d0f80b15d1aaa46a',
+    meta: '0xc10d42fed5d1c5a19d49589355db0713a9a98d7d',
+    record: '0xb50e948a5d48c160495f6fab163e6a1da8a4c2a2',
+    trace: '0xb3f031f262def737a84a2fe95166ad00f6739025'
 };

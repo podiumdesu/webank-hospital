@@ -3,7 +3,7 @@ import { Configuration } from './config';
 import { Transaction } from './transactionObject';
 
 export function getSignTx(
-    { groupID, account: { address, privateKey }, chainID }: Configuration,
+    { groupID, address, privateKey, chainID }: Configuration,
     to: string,
     txData: string,
     blockLimit: number
@@ -19,12 +19,12 @@ export function getSignTx(
         groupId: groupID,
         extraData: '0x0'
     });
-    tx.sign(Buffer.from(privateKey, 'hex'));
+    tx.sign(privateKey);
     return tx.serialize();
 }
 
 export function getSignDeployTx(
-    { groupID, account: { address, privateKey }, chainID }: Configuration,
+    { groupID, address, privateKey, chainID }: Configuration,
     bin: string,
     blockLimit: number,
     extraData = '0x0',
@@ -39,6 +39,6 @@ export function getSignDeployTx(
         groupId: groupID,
         extraData
     });
-    tx.sign(Buffer.from(privateKey, 'hex'));
+    tx.sign(privateKey);
     return tx.serialize();
 }

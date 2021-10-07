@@ -1,5 +1,4 @@
-const EC_PRIVATE_KEY_PREFIX = '30740201010420';
-const PRIVATE_KEY_PREFIX_LEN = 66;
+import { utils } from "ethers";
 
 export class Configuration {
     authentication: {
@@ -11,10 +10,8 @@ export class Configuration {
     timeout: number;
     groupID: number;
     chainID: number;
-    account: {
-        privateKey: string;
-        address: string;
-    }
+    privateKey: Buffer;
+
     constructor(config: {
         authentication: {
             key: string;
@@ -25,24 +22,17 @@ export class Configuration {
         timeout: number;
         groupID: number;
         chainID: number;
-        account: {
-            privateKey: string;
-            address: string;
-        }
+        privateKey: Buffer;
     }) {
         this.authentication = config.authentication;
         this.nodes = config.nodes;
         this.timeout = config.timeout;
         this.groupID = config.groupID;
         this.chainID = config.chainID;
-        this.account = {
-            privateKey: this._parsePrivateKey(config.account.privateKey),
-            address: config.account.address
-        }
+        this.privateKey = config.privateKey;
     }
 
-    _parsePrivateKey(privateKey: string) {
-        privateKey = Buffer.from(privateKey.split('\n').filter(Boolean).slice(1, -1).join(''), 'base64').toString('hex');
-        return privateKey.startsWith(EC_PRIVATE_KEY_PREFIX) ? privateKey.slice(EC_PRIVATE_KEY_PREFIX.length, EC_PRIVATE_KEY_PREFIX.length + 64) : privateKey.slice(PRIVATE_KEY_PREFIX_LEN, PRIVATE_KEY_PREFIX_LEN + 64);
+    get address() {
+        return utils.computeAddress(this.privateKey);
     }
 }

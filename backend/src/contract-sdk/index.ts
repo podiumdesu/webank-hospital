@@ -189,7 +189,7 @@ export class Web3jService {
                 status: string;
             }
         }>('call', [this.config.groupID, {
-            from: this.config.account.address,
+            from: this.config.address,
             to,
             value: '0x0',
             data: `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`
