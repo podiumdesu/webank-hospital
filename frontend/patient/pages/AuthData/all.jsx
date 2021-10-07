@@ -1,32 +1,21 @@
-import React from 'react';
-import { AddOutline } from 'antd-mobile-icons';
-import { RecordCard, CardContainer } from '@/components/RecordCard';
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import { RecordCard } from '@/components/RecordCard';
 import { db, stores } from '@/stores/idb';
 import { CID } from 'multiformats/cid';
-
-const cids = await db.getAllKeys(stores.record);
-const record = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)]));
+import { useAsyncEffect } from '#/hooks/useAsyncEffect';
 
 export default () => {
+    const [records, setRecords] = useState([]);
+
+    useAsyncEffect(async () => {
+        const cids = await db.getAllKeys(stores.record);
+        setRecords(await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)])));
+    }, []);
+
     return (
-        <div className='px-4'>
-            {/*
-            <CardContainer
-                left={
-                    <div className='flex-1'>
-                        <p className='text-dark-black font-semibold text-base'>新病历</p>
-                    </div>
-                }
-                right={
-                    <div className='flex items-center'>
-                        <Link to='new'><AddOutline className='text-6178EE' /></Link>
-                    </div>
-                }
-            />
-            */}
+        <div className="px-4">
             {
-                record.map(([cid, { time, title, description, attachments }], _idx) => (
+                records.map(([cid, { time, title, description, attachments }], _idx) => (
                     <RecordCard
                         time={time}
                         title={title}
@@ -38,5 +27,5 @@ export default () => {
                 ))
             }
         </div>
-    )
+    );
 }

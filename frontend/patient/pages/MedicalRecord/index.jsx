@@ -1,16 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react';
 import { RecordCard } from '@/components/RecordCard'
 import { db, stores } from '@/stores/idb';
 import { CID } from 'multiformats/cid';
-
-const cids = await db.getAllKeys(stores.record);
-const record = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)]));
+import { useAsyncEffect } from '#/hooks/useAsyncEffect';
 
 export default () => {
+    const [records, setRecords] = useState([]);
+
+    useAsyncEffect(async () => {
+        const cids = await db.getAllKeys(stores.record);
+        setRecords(await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)])));
+    }, []);
+
     return (
         <div className='px-4'>
             {
-                record.map(([cid, { time, title, description, attachments }], _idx) => (
+                records.map(([cid, { time, title, description, attachments }], _idx) => (
                     <RecordCard
                         time={time}
                         title={title}
