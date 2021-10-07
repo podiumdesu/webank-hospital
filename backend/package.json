@@ -18,6 +18,8 @@
     "scripts": {
         "start:dev": "ts-node src/index.ts",
         "start:prod": "node dist/index.js",
+        "deploy": "ts-node src/deploy.ts",
+        "ca": "ts-node src/ca.ts",
         "build": "tsc"
     }
 }
