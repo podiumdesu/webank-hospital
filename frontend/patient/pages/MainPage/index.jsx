@@ -65,7 +65,7 @@ class App extends React.Component {
           <Swiper autoplay indicatorProps={{ color: 'white' }}>
             {carouselData.map(val => (
               <Swiper.Item key={val}>
-                <img src={val} alt='' />
+                <img src={val} alt='' className='w-full' />
               </Swiper.Item>
             ))}
           </Swiper>
