@@ -20,13 +20,15 @@ export default defineConfig({
       '@': resolve(__dirname, 'patient'),
       '#': resolve(__dirname, 'common'),
       '$': resolve(__dirname, 'doctor'),
+      '%': resolve(__dirname, 'pharmacy'),
     }
   },
   build: {
     rollupOptions: {
       input: {
         doctor: resolve(__dirname, 'doctor.html'),
-        patient: resolve(__dirname, 'patient.html')
+        patient: resolve(__dirname, 'patient.html'),
+        pharmacy: resolve(__dirname, 'pharmacy.html'),
       }
     }
   }
