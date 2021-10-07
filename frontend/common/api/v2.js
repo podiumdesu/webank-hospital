@@ -1,125 +1,72 @@
 import { utils } from 'ethers';
 import { encode } from '@ethersproject/rlp';
 import { ecdsaSign } from 'secp256k1';
-import { hexToUint8Array } from '#/utils/codec'
+import { hexToUint8Array } from '#/utils/codec';
+import { keccak_256 } from 'js-sha3';
 import axios from 'axios';
-import { API } from '#/constants';
+import { ENDPOINT } from '#/constants';
 
 const addresses = {
-    record: '0x9cb6ae3860995b076920ef1eb8f5ccea8795cbcb',
-    meta: '0xca22a148c68be6c78337cfdb3011b9f0c4b08e97',
-    trace: '0xadc44d3d2c2e02611a0d522662ec95fa51ed017c',
+    ca: '0xaaa6e5180433ab684dbf5e87d0f80b15d1aaa46a',
+    meta: '0xc10d42fed5d1c5a19d49589355db0713a9a98d7d',
+    record: '0xb50e948a5d48c160495f6fab163e6a1da8a4c2a2',
+    trace: '0xb3f031f262def737a84a2fe95166ad00f6739025'
 };
 
-export const clientConfig = {
-    account: {
-        privateKey: hexToUint8Array('744610fbe6fdd90f9e4cdfc3e3fdaf3d1d6b8b50848df4cbd3a07301a2755b2a'), //  openssl ec -in a -text -noout
-        address: '0x440bc044b9dac7b0f2aadc735d62b7c7f851d053',
-    },
-    groupID: 1,
-    chainID: 1,
-};
-
-const padToEven = (str) => str.length % 2 ? `0${str}` : str;
-
-class Transaction {
-    raw = [];
-    sig = [
-        new Uint8Array([0x1c]), // v
-        new Uint8Array(), // r
-        new Uint8Array() // s
-    ];
-
-    constructor(data) {
-        this.raw = [
-            'randomid',
-            'gasPrice',
-            'gas',
-            'blockLimit',
-            'to',
-            'value',
-            'data',
-            'chainId',
-            'groupId',
-            'extraData'
-        ].map((key) => {
-            const value = data[key];
-            if (value instanceof Uint8Array) {
-                return value;
-            }
-            switch (typeof value) {
-                case 'number':
-                    return hexToUint8Array(padToEven(value.toString(16)));
-                case 'string':
-                    return hexToUint8Array(padToEven(value.slice(2)));
-                default:
-                    return new Uint8Array();
-            }
-        })
+export class ClientConfig {
+    constructor(privateKey, groupId = 1, chainId = 1) {
+        this.privateKey = hexToUint8Array(privateKey);
+        this.groupId = groupId;
+        this.chainId = chainId;
     }
 
-    serialize() {
-        return encode([...this.raw, ...this.sig]);
-    }
-
-    sign(privateKey) {
-        const { signature, recid } = ecdsaSign(crypto.getRandomValues(new Uint8Array(32)), privateKey);
-        this.sig = [
-            new Uint8Array([recid + 27]),
-            signature.slice(0, 32),
-            signature.slice(32, 64),
-        ]
+    get address() {
+        return utils.computeAddress(this.privateKey);
     }
 }
 
-const getSignTx = (
-    { groupID, account: { address, privateKey }, chainID },
+const signAndSerialize = (transaction, privateKey) => {
+    const data = [
+        'randomid', 'gasPrice', 'gas', 'blockLimit', 'to', 'value', 'data', 'chainId', 'groupId', 'extraData'
+    ].map((key) => utils.arrayify(transaction[key] ?? new Uint8Array()));
+    const { signature, recid } = ecdsaSign(new Uint8Array(keccak_256.update(hexToUint8Array(encode(data).slice(2))).arrayBuffer()), privateKey);
+    return encode(data.concat([
+        new Uint8Array([recid + 27]),
+        signature.slice(0, 32),
+        signature.slice(32, 64),
+    ]));
+};
+
+const getSignTx = ({ groupId, address, privateKey, chainId }, to, txData, blockLimit) => signAndSerialize({
+    data: txData,
+    from: address,
     to,
-    txData,
-    blockLimit
-) => {
-    const tx = new Transaction({
-        data: txData,
-        from: address,
-        to,
-        gas: 1000000,
-        randomid: crypto.getRandomValues(new Uint8Array(16)),
-        blockLimit,
-        chainId: chainID,
-        groupId: groupID,
-        extraData: '0x0'
-    });
-    tx.sign(privateKey);
-    return tx.serialize();
-};
-
-const getSignDeployTx = (
-    { groupID, account: { address, privateKey }, chainID },
-    bin,
+    gas: 1000000,
+    randomid: crypto.getRandomValues(new Uint8Array(16)),
     blockLimit,
-    extraData = '0x0',
-) => {
-    const tx = new Transaction({
-        data: bin.startsWith('0x') ? bin : ('0x' + bin),
-        from: address,
-        gas: 1000000,
-        randomid: crypto.getRandomValues(new Uint8Array(16)),
-        blockLimit,
-        chainId: chainID,
-        groupId: groupID,
-        extraData
-    });
-    tx.sign(privateKey);
-    return tx.serialize();
-};
+    chainId,
+    groupId,
+    extraData: '0x00'
+}, privateKey);
 
-class Web3jService {
+const getSignDeployTx = ({ groupId, address, privateKey, chainId }, bin, blockLimit, extraData = '0x00') => signAndSerialize({
+    data: `0x${bin}`,
+    from: address,
+    gas: 1000000,
+    randomid: crypto.getRandomValues(new Uint8Array(16)),
+    blockLimit,
+    chainId,
+    groupId,
+    extraData
+}, privateKey);
+
+class Client {
     constructor(config) {
         this.config = config;
     }
 
     async request(method, params, isQuery = true) {
-        return (await axios.post(`${API}/rpc`, {
+        return (await axios.post(`${ENDPOINT}/rpc`, {
             method,
             params,
             isQuery,
@@ -127,95 +74,95 @@ class Web3jService {
     }
 
     getBlockNumber() {
-        return this.request('getBlockNumber', [this.config.groupID]);
+        return this.request('getBlockNumber', [this.config.groupId]);
     }
 
     getPbftView() {
-        return this.request('getPbftView', [this.config.groupID]);
+        return this.request('getPbftView', [this.config.groupId]);
     }
 
     getObserverList() {
-        return this.request('getObserverList', [this.config.groupID]);
+        return this.request('getObserverList', [this.config.groupId]);
     }
 
     getSealerList() {
-        return this.request('getSealerList', [this.config.groupID]);
+        return this.request('getSealerList', [this.config.groupId]);
     }
 
     getConsensusStatus() {
-        return this.request('getConsensusStatus', [this.config.groupID]);
+        return this.request('getConsensusStatus', [this.config.groupId]);
     }
 
     getSyncStatus() {
-        return this.request('getSyncStatus', [this.config.groupID]);
+        return this.request('getSyncStatus', [this.config.groupId]);
     }
 
     getClientVersion() {
-        return this.request('getClientVersion', [this.config.groupID]);
+        return this.request('getClientVersion', [this.config.groupId]);
     }
 
     getPeers() {
-        return this.request('getPeers', [this.config.groupID]);
+        return this.request('getPeers', [this.config.groupId]);
     }
 
     getNodeIDList() {
-        return this.request('getNodeIDList', [this.config.groupID]);
+        return this.request('getNodeIDList', [this.config.groupId]);
     }
 
     getGroupPeers() {
-        return this.request('getGroupPeers', [this.config.groupID]);
+        return this.request('getGroupPeers', [this.config.groupId]);
     }
 
     getGroupList() {
-        return this.request('getGroupList', [this.config.groupID]);
+        return this.request('getGroupList', [this.config.groupId]);
     }
 
     getBlockByHash(blockHash, includeTransactions) {
-        return this.request('getBlockByHash', [this.config.groupID, blockHash, includeTransactions]);
+        return this.request('getBlockByHash', [this.config.groupId, blockHash, includeTransactions]);
     }
 
     getBlockByNumber(blockNumber, includeTransactions) {
-        return this.request('getBlockByNumber', [this.config.groupID, blockNumber, includeTransactions]);
+        return this.request('getBlockByNumber', [this.config.groupId, blockNumber, includeTransactions]);
     }
 
     getBlockHashByNumber(blockNumber) {
-        return this.request('getBlockHashByNumber', [this.config.groupID, blockNumber]);
+        return this.request('getBlockHashByNumber', [this.config.groupId, blockNumber]);
     }
 
     getTransactionByHash(transactionHash) {
-        return this.request('getTransactionByHash', [this.config.groupID, transactionHash]);
+        return this.request('getTransactionByHash', [this.config.groupId, transactionHash]);
     }
 
     getTransactionByBlockHashAndIndex(blockHash, transactionIndex) {
-        return this.request('getTransactionByBlockHashAndIndex', [this.config.groupID, blockHash, transactionIndex]);
+        return this.request('getTransactionByBlockHashAndIndex', [this.config.groupId, blockHash, transactionIndex]);
     }
 
     getTransactionByBlockNumberAndIndex(blockNumber, transactionIndex) {
-        return this.request('getTransactionByBlockNumberAndIndex', [this.config.groupID, blockNumber, transactionIndex]);
+        return this.request('getTransactionByBlockNumberAndIndex', [this.config.groupId, blockNumber, transactionIndex]);
     }
 
     getPendingTransactions() {
-        return this.request('getPendingTransactions', [this.config.groupID]);
+        return this.request('getPendingTransactions', [this.config.groupId]);
     }
 
     getPendingTxSize() {
-        return this.request('getPendingTxSize', [this.config.groupID]);
+        return this.request('getPendingTxSize', [this.config.groupId]);
     }
 
     getTotalTransactionCount() {
-        return this.request('getTotalTransactionCount', [this.config.groupID]);
+        return this.request('getTotalTransactionCount', [this.config.groupId]);
     }
 
     getTransactionReceipt(txHash) {
-        return this.request('getTransactionReceipt', [this.config.groupID, txHash]);
+        return this.request('getTransactionReceipt', [this.config.groupId, txHash]);
     }
 
     getCode(address) {
-        return this.request('getCode', [this.config.groupID, address]);
+        return this.request('getCode', [this.config.groupId, address]);
     }
 
     getSystemConfigByKey(key) {
-        return this.request('getSystemConfigByKey', [this.config.groupID, key]);
+        return this.request('getSystemConfigByKey', [this.config.groupId, key]);
     }
 
     async sendRawTransaction(to, f, params) {
@@ -225,7 +172,7 @@ class Web3jService {
         const blockNumber = parseInt((await this.getBlockNumber()).result, 16);
         const txData = `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`;
         const signTx = getSignTx(this.config, to, txData, blockNumber + 500);
-        const { status, statusMsg, output } = await this.request('sendRawTransaction', [this.config.groupID, signTx], false);
+        const { status, statusMsg, output } = await this.request('sendRawTransaction', [this.config.groupId, signTx], false);
         if (parseInt(status, 16)) {
             throw new Error(statusMsg);
         } else {
@@ -243,15 +190,15 @@ class Web3jService {
         const signTx = bin.startsWith('0061736d')
             ? getSignDeployTx(this.config, bin, blockNumber + 500, paramsBin)
             : getSignDeployTx(this.config, bin + paramsBin.slice(2), blockNumber + 500);
-        return this.request('sendRawTransaction', [this.config.groupID, signTx], false);
+        return this.request('sendRawTransaction', [this.config.groupId, signTx], false);
     }
 
     async call(to, f, params) {
         const iface = new utils.Interface([f]);
         const func = Object.values(iface.functions)[0];
 
-        const { result: { output, status } } = await this.request('call', [this.config.groupID, {
-            from: this.config.account.address,
+        const { result: { output, status } } = await this.request('call', [this.config.groupId, {
+            from: this.config.address,
             to,
             value: '0x0',
             data: `${iface.getSighash(func)}${iface._encodeParams(func.inputs, params).slice(2)}`
@@ -264,57 +211,73 @@ class Web3jService {
     }
 }
 
-const service = new Web3jService(clientConfig);
+export class API {
+    constructor(config) {
+        this.client = new Client(config);
+    }
 
-export const getRecord = async (id) => {
-    const [key] = await service.call(
-        addresses.record,
-        'function get(string memory id) public view returns (string[2] memory)',
-        [id],
-    );
-    return key;
-};
-export const setRecord = async (id, ca) => {
-    await service.sendRawTransaction(
-        addresses.record,
-        'function set(string memory id, string[2] memory key) public',
-        [id, ca],
-    );
-}
-export const reEncrypt = async (id, rk) => {
-    const [cb] = await service.call(
-        addresses.record,
-        'function re_encrypt(string memory id, string memory rk) public view returns (string[2] memory)',
-        [id, rk],
-    );
-    return cb;
-};
-
-export const getTrace = async (id) => {
-    const [length] = await service.call(
-        addresses.trace,
-        'function get_trace_length(string memory id) public view returns (uint32)',
-        [id],
-    );
-    return await Promise.all([...new Array(length).keys()].map(async (i) => {
-        const [item] = await service.call(
-            addresses.trace,
-            'function get_trace_item(string memory id, uint32 index) public view returns (string memory id)',
-            [id, i],
+    async getRecord(id) {
+        const [key] = await this.client.call(
+            addresses.record,
+            'function get(string memory id) public view returns (string[2] memory)',
+            [id],
         );
-        return item;
-    }));
-};
-export const setTrace = async (id, c, proof) => {
-    await service.sendRawTransaction(
-        addresses.trace,
-        'function set(string memory id, string memory c, string memory proof) public',
-        [id, c, proof],
-    );
-};
+        return key;
+    }
 
-export const getBlockHash = async () => {
-    const { result } = await service.getBlockNumber();
-    const { result: { hash } } = await service.getBlockByNumber((+result).toString(), false);
-    return hash.slice(2);
-};
+    async setRecord(id, ca) {
+        await this.client.sendRawTransaction(
+            addresses.record,
+            'function set(string memory id, string[2] memory key) public',
+            [id, ca],
+        );
+    }
+
+    async reEncrypt(id, rk) {
+        const [cb] = await this.client.call(
+            addresses.record,
+            'function re_encrypt(string memory id, string memory rk) public view returns (string[2] memory)',
+            [id, rk],
+        );
+        return cb;
+    }
+
+    async getTrace(id) {
+        const [length] = await this.client.call(
+            addresses.trace,
+            'function get_trace_length(string memory id) public view returns (uint32)',
+            [id],
+        );
+        return await Promise.all([...new Array(length).keys()].map(async (i) => {
+            const [item] = await this.client.call(
+                addresses.trace,
+                'function get_trace_item(string memory id, uint32 index) public view returns (string memory id)',
+                [id, i],
+            );
+            return item;
+        }));
+    }
+
+    async setTrace(id, c, proof) {
+        await this.client.sendRawTransaction(
+            addresses.trace,
+            'function set(string memory id, string memory c, string memory proof) public',
+            [id, c, proof],
+        );
+    }
+
+    async getBlockHash() {
+        const { result } = await this.client.getBlockNumber();
+        const { result: { hash } } = await this.client.getBlockByNumber((+result).toString(), false);
+        return hash.slice(2);
+    }
+
+    async verify(address, hash, v, r, s, timestamp) {
+        const [valid] = await this.client.call(
+            addresses.ca,
+            'function isValid(address member, bytes32 hash, uint8 v, bytes32 r, bytes32 s, uint timestamp) public view returns (bool)',
+            [address, hash, v, r, s, timestamp],
+        );
+        return valid;
+    }
+}

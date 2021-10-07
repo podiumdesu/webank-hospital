@@ -9,7 +9,7 @@ import { CID } from 'multiformats/cid';
 import { hmac } from '#/utils/hmac';
 import { AES } from '#/utils/aes';
 import { cat } from '#/utils/ipfs';
-import { setRecord } from '#/api/v2';
+import { api } from '@/api';
 import { db, stores } from '@/stores/idb';
 import { useMobxStore } from '@/stores/mobx';
 import { useNavigate } from 'react-router-dom';
@@ -59,7 +59,11 @@ export default () => {
             const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
 
             // display the data and wait user for approval
-            setData(JSON.parse(await aes.decrypt(buffer.slice(12), '')));
+            {
+                const { data, signature, recid } = JSON.parse(await aes.decrypt(buffer.slice(12), ''));
+                console.log(signature, recid);
+                setData(data);
+            }
 
             Toast.show({
                 icon: <CheckOutline className='mx-auto' />,
@@ -77,7 +81,7 @@ export default () => {
     }
     const handleUpload = async () => {
         try {
-            await setRecord(await hmac(cid.bytes, await store.hk, ''), ca.map(i => i.serializeToHexStr()));
+            await api.setRecord(await hmac(cid.bytes, await store.hk, ''), ca.map(i => i.serializeToHexStr()));
             await db.put(stores.record, {
                 time: new Date(data.time),
                 title: `${data.hospital} ${data.department}`,
