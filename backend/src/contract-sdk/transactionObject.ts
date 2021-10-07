@@ -1,5 +1,5 @@
-import { Keccak } from 'sha3';
 import { encode } from '@ethersproject/rlp';
+import { keccak_256 } from 'js-sha3';
 import { ecdsaRecover, ecdsaSign } from 'secp256k1';
 
 const padToEven = (str: string) => str.length % 2 ? `0${str}` : str;
@@ -45,7 +45,7 @@ export class Transaction {
     }
 
     hash() {
-        return new Keccak(256).update(encode(this.raw)).digest()
+        return Buffer.from(keccak_256.update(Buffer.from(encode(this.raw).slice(2), 'hex')).arrayBuffer());
     }
 
     verify() {
