@@ -1,4 +1,4 @@
-# 链+医疗服务平台
+# 医链服务平台
 
 ## 简介
 
@@ -41,13 +41,14 @@
     * 经过裁剪的最小化Contract SDK
 * 区块链网络
     * 平台
-        * FISCO BCOS
+        * FISCO-BCOS
     * 预编译合约
         * C++
         * Rust FFI
         * [mcl](https://github.com/herumi/mcl)
         * [winterfell](https://github.com/novifinancial/winterfell)
     * 合约
+        * Solidity
         * [Liquid](https://github.com/WeBankBlockchain/liquid) (Rust)
     * 存储
         * IPFS
