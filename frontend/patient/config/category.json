@@ -9,7 +9,7 @@
     "outPatientPayment": "门诊缴费",
     "outPatientRevisit": "门诊回访",
     "checkAppointment": "检查预约",
-    "followUpMedicineDispensing": "在线复诊配药",
+    "traceMedicine": "药品溯源",
     "outPatientInquiry": "出/停诊查询",
     "covidInfo": "新冠疫情速递",
     "covidTestAppointment": "核酸检测预约",
