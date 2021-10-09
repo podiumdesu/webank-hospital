@@ -5,14 +5,15 @@ import { randomHexString } from '#/utils/random';
 import { Basic } from './Basic';
 import { Section } from './Section';
 import { SubmissionDialog } from '$/components/SubmissionDialog';
+import { Attachment } from '$/components/AttachmentTable';
 import { clientConfig } from '$/config';
 
 const getDefaultValue = () => ({
     type: 'examination',
     address: clientConfig.address,
     hospital: '',
-    department: '',
     doctor: '',
+    project: '',
     number: randomHexString(),
     name: '',
     gender: '',
@@ -25,6 +26,7 @@ export const EditExamination = () => {
     const [internal, setInternal] = useState([]);
     const [surgical, setSurgical] = useState([]);
     const [cbc, setCBC] = useState([]);
+    const [attachments, setAttachments] = useState([]);
     const [data, setData] = useState(undefined);
     const {
         control,
@@ -37,7 +39,7 @@ export const EditExamination = () => {
     });
     const onSubmit = (data) => {
         data.age = +data.age;
-        setData({ ...data, general, internal, surgical, cbc });
+        setData({ ...data, general, internal, surgical, cbc, attachments });
     };
     const onFinish = () => {
         reset(getDefaultValue());
@@ -46,6 +48,7 @@ export const EditExamination = () => {
         setInternal([]);
         setSurgical([]);
         setCBC([]);
+        setAttachments([]);
     };
     return (
         <Stack spacing={1} flex='1' overflow='auto' p={1} component='form' onSubmit={handleSubmit(onSubmit)}>
@@ -54,6 +57,7 @@ export const EditExamination = () => {
             <Section items={internal} setItems={setInternal} title='内科' />
             <Section items={surgical} setItems={setSurgical} title='外科' />
             <Section items={cbc} setItems={setCBC} title='血常规' />
+            <Attachment attachments={attachments} setAttachments={setAttachments} title='详细报告' />
             <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />
             <Button
                 disabled={!isValid}

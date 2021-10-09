@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { randomHexString } from '#/utils/random';
 import { Basic } from './Basic';
 import { Prescription } from './Prescription';
-import { Attachment } from './Attachment';
+import { Attachment } from '$/components/AttachmentTable';
 import { SubmissionDialog } from '$/components/SubmissionDialog';
 import { clientConfig } from '$/config';
 
@@ -53,7 +53,7 @@ export const EditRecord = () => {
         <Stack spacing={1} flex='1' overflow='auto' p={1} component='form' onSubmit={handleSubmit(onSubmit)}>
             <Basic control={control} isValid={isValid} />
             <Prescription drugs={drugs} setDrugs={setDrugs} />
-            <Attachment attachments={attachments} setAttachments={setAttachments} />
+            <Attachment attachments={attachments} setAttachments={setAttachments} title='辅助检查' />
             <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />
             <Button
                 disabled={!isValid}

@@ -12,6 +12,7 @@ export const Basic = ({ control }) => {
             <Stack spacing={2}>
                 <Input name='address' label='地址' control={control} disabled />
                 <Input name='number' label='单号' control={control} disabled />
+                <Input name='project' label='项目' control={control} />
                 <Stack direction='row' spacing={1}>
                     <Input name='hospital' label='机构' control={control} sx={{ flex: 2 }} />
                     <Input name='doctor' label='医生' control={control} sx={{ flex: 1 }} />

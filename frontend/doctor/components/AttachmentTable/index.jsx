@@ -7,7 +7,7 @@ import React from 'react';
 import { AES } from '#/utils/aes';
 import { add } from '#/utils/ipfs';
 
-export const Attachment = ({ attachments, setAttachments }) => {
+export const Attachment = ({ attachments, setAttachments, title }) => {
     const {
         control,
         handleSubmit,
@@ -46,7 +46,7 @@ export const Attachment = ({ attachments, setAttachments }) => {
                 },
             ]}
             rows={attachments}
-            title='辅助检查'
+            title={title}
             deleteRow={(id) => setAttachments(attachments.filter((attachment) => attachment.id !== id))}
             updateRow={(id) => handleSubmit(async ({ attachment }) => {
                 if (attachment?.length !== 1) {
