@@ -14,6 +14,7 @@ const ReportProgress = loadable(() => import('@/pages/ReportProgress'));
 const NewAuthData = loadable(() => import('@/pages/AuthData/new'));
 const AllAuthData = loadable(() => import('@/pages/AuthData/all'));
 const DetailedAuthData = loadable(() => import('@/pages/AuthData/detail'));
+const TraceMedicine = loadable(() => import('@/pages/TraceMedicine'));
 
 export const routes = [
     {
@@ -55,6 +56,11 @@ export const routes = [
         path: '/reportProgress',
         element: <ReportProgress />,
         title: '报告进度'
+    },
+    {
+        path: '/traceMedicine',
+        element: <TraceMedicine />,
+        title: '药品溯源'
     },
     {
         path: '/authData',
