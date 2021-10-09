@@ -49,7 +49,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
     }
     return (
         <Dialog open={open}>
-            <DialogTitle>提交病历</DialogTitle>
+            <DialogTitle>提交流程</DialogTitle>
             {open && <DialogContent>
                 <Stepper activeStep={step} orientation="vertical">
                     <Step>
@@ -60,7 +60,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
                         </StepContent>
                     </Step>
                     <Step>
-                        <StepLabel>加密并上传病历</StepLabel>
+                        <StepLabel>加密并上传</StepLabel>
                         <StepContent>
                             <Button onClick={handleUpload}>
                                 上传
@@ -68,7 +68,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
                         </StepContent>
                     </Step>
                     <Step>
-                        <StepLabel>数据上链</StepLabel>
+                        <StepLabel>用户上链</StepLabel>
                         <StepContent>
                             <Typography>请让用户扫描下图所示的二维码</Typography>
                             <Box component="img" src={result} display="block" mx='auto' />
