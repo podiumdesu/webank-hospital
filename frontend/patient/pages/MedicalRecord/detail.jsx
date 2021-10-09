@@ -19,7 +19,7 @@ import banlangen from '@/images/medicineImg/banlangen.png';
 import dy35 from '@/images/medicineImg/dy35.png';
 import lianhua from '@/images/medicineImg/lianhua.png';
 import toubao from '@/images/medicineImg/toubao.png';
-import nacl from '@/iamges/medicineImg/nacl.png';
+import nacl from '@/images/medicineImg/nacl.png';
 import { useAsyncEffect } from '#/hooks/useAsyncEffect';
 import { keccak_256 } from 'js-sha3';
 import { hexToUint8Array } from '#/utils/codec';
@@ -65,6 +65,7 @@ export default () => {
                 await api.getRecordTime(id),
             ));
             setData(data);
+            console.log(data)
         } catch (e) {
             Toast.show({
                 icon: <CloseOutline className='mx-auto' />,
@@ -117,13 +118,13 @@ export default () => {
                         西药处方
                     </p>
                     <div className='grid grid-cols-2 gap-3'>
-                        {data.drugs.map(({ name, quantity }, index) => (
+                        {data.drugs.map(({ drug, quantity }, index) => (
                             <div key={index}>
                                 <div className='bg-white h-24 rounded-t-xl flex justify-center py-1'>
-                                    <img className='h-full' src={medicineImg[name] ? medicineImg[name] : ''} alt='' />
+                                    <img className='h-full' src={medicineImg[drug] ? medicineImg[drug] : ''} alt='' />
                                 </div>
                                 <div className='rounded-b-xl py-2 text-center bg-[#AFD0FB] text-dark-black'>
-                                    <p className='font-bold text-xs'>药品名: {name}</p>
+                                    <p className='font-bold text-xs'>药品名: {drug}</p>
                                     <p className='font-medium text-2xs'>剂量: {quantity}</p>
                                 </div>
                             </div>
