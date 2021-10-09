@@ -47,8 +47,8 @@ function copyStringToMemory(str) {
     return ptr;
 }
 
-export const hash = (r0, r1) => copyBufferFromMemory(
-    _hash(copyBufferToMemory(r0), copyBufferToMemory(r1)),
+export const hash = (prevDigest, r) => copyBufferFromMemory(
+    _hash(copyBufferToMemory(prevDigest), copyBufferToMemory(r)),
     32
 );
 
