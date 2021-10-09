@@ -41,7 +41,7 @@ mod drug_traceability {
 
     #[liquid(storage)]
     struct DrugTraceability {
-        traces: storage::Mapping<String, Vec<String>>,
+        traces: storage::Mapping<String, Vec<(String, timestamp)>>,
         meta_addr: storage::Value<address>,
     }
 
@@ -53,24 +53,28 @@ mod drug_traceability {
         }
 
         pub fn get_trace_length(&self, id: String) -> u32 {
+            if !self.traces.contains_key(&id) {
+                return 0;
+            }
             self.traces.get(&id).unwrap().len() as u32
         }
 
-        pub fn get_trace_item(&self, id: String, index: u32) -> String {
+        pub fn get_trace_item(&self, id: String, index: u32) -> (String, timestamp) {
             self.traces.get(&id).unwrap()[index as usize].clone()
         }
 
         pub fn set(&mut self, id: String, c: String, proof: String) {
+            let now = self.env().now();
             let rescue = Rescue::at("0x5008".parse().unwrap());
             let meta = Meta::at(*self.meta_addr);
             let last_block = format!("{:02x}", ByteBuf(&meta.lastBlockHash().unwrap().0));
             let digest = rescue.hash(id.clone(), last_block.clone()).unwrap();
             if rescue.verify(last_block.clone(), digest.clone(), proof).unwrap() {
                 if !self.traces.contains_key(&id) {
-                    let vec: Vec<String> = Vec::new();
+                    let vec: Vec<(String, timestamp)> = Vec::new();
                     self.traces.insert(&id, vec);
                 }
-                self.traces.get_mut(&id).unwrap().push(c);
+                self.traces.get_mut(&id).unwrap().push((c, now));
             }
         }
     }
