@@ -6,6 +6,8 @@ import loadable from '@loadable/component'
 const MedicalCard = loadable(() => import('@/pages/MedicalCard'));
 const MedicalRecord = loadable(() => import('@/pages/MedicalRecord'));
 const DetailedMedicalRecord = loadable(() => import('@/pages/MedicalRecord/detail'));
+const MedicalExamination = loadable(() => import('@/pages/MedicalExamination'));
+const DetailedMedicalExamination = loadable(() => import('@/pages/MedicalExamination/detail'));
 const ReportProgress = loadable(() => import('@/pages/ReportProgress'));
 const NewAuthData = loadable(() => import('@/pages/AuthData/new'));
 const AllAuthData = loadable(() => import('@/pages/AuthData/all'));
@@ -29,6 +31,21 @@ export const routes = [
       {
         path: '',
         element: <MedicalRecord />,
+      }
+    ]
+  },
+  {
+    path: '/physicalExamData',
+    element: <Outlet />,
+    title: '体检数据',
+    children: [
+      {
+        path: ':cid',
+        element: <DetailedMedicalExamination />,
+      },
+      {
+        path: '',
+        element: <MedicalExamination />,
       }
     ]
   },
