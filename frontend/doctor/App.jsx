@@ -4,8 +4,9 @@ import { BottomNavigation, BottomNavigationAction, CssBaseline, Stack, ThemeProv
 import { LocalizationProvider } from '@mui/lab';
 import { Add, Download } from '@mui/icons-material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import { Edit } from '$/views/Edit';
+import { EditRecord } from '$/views/EditRecord';
 import { Get } from '$/views/Get';
+import { EditExamination } from '$/views/EditExamination';
 
 const theme = responsiveFontSizes(createTheme({}));
 
@@ -16,8 +17,8 @@ export const App = () => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <Stack height="100vh" bgcolor="#fafafa">
-                    {value === 0 ? <Edit /> : <Get />}
+                <Stack height='100vh' bgcolor='#fafafa'>
+                    {[<EditRecord />, <EditExamination />, <Get />][value]}
                     <BottomNavigation
                         showLabels
                         value={value}
@@ -25,8 +26,9 @@ export const App = () => {
                             setValue(newValue);
                         }}
                     >
-                        <BottomNavigationAction label="编写病历" icon={<Add />} />
-                        <BottomNavigationAction label="获取病历" icon={<Download />} />
+                        <BottomNavigationAction label='编写病历' icon={<Add />} />
+                        <BottomNavigationAction label='编写体检报告' icon={<Add />} />
+                        <BottomNavigationAction label='申请授权' icon={<Download />} />
                     </BottomNavigation>
                 </Stack>
             </ThemeProvider>
