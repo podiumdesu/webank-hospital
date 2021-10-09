@@ -9,7 +9,8 @@ export default () => {
 
     useAsyncEffect(async () => {
         const cids = await db.getAllKeys(stores.record);
-        setRecords(await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)])));
+        const records = await Promise.all(cids.map(async (cid) => [new Uint8Array(cid), await db.get(stores.record, cid)]));
+        setRecords(records.sort(([, a], [, b]) => new Date(b.time) - new Date(a.time)));
     }, []);
 
     return (
