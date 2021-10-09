@@ -40,7 +40,8 @@ export default () => {
     useAsyncEffect(async () => {
         try {
             const bytes = CID.parse(cid).bytes;
-            const [ca0, ca1] = await api.getRecord(await hmac(bytes, await store.hk, ''));
+            const id = await hmac(bytes, await store.hk, '');
+            const [ca0, ca1] = await api.getRecord(id);
             const ca = [new Fr(), new G1()];
             ca[0].deserializeHexStr(ca0);
             ca[1].deserializeHexStr(ca1);
@@ -54,14 +55,13 @@ export default () => {
             const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
             const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
             const { data, signature, recid } = JSON.parse(await aes.decrypt(buffer.slice(12), ''));
-            console.log(data.address);
             console.log(await api.verify(
                 data.address,
                 keccak_256.update(JSON.stringify(data)).array(),
                 recid + 27,
                 hexToUint8Array(signature.slice(0, 64)),
                 hexToUint8Array(signature.slice(64)),
-                +new Date(data.time)
+                await api.getRecordTime(id),
             ));
             setData(data);
         } catch (e) {
