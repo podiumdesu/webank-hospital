@@ -77,5 +77,5 @@ export const addresses = {
     ca: '0xec8ec3a0a197e3fcd863a6e62cf41a8a7b67f82f',
     meta: '0x82eed2574b8e9890a819ecce2bbf5713c8308e42',
     record: '0x8501300079e7ea715bd785d2bbafbf81ecb5db21',
-    trace: '0x5533d9a8235c6b4f82a75aa31d5c3e7f18db68a0'
+    trace: '0x98db49ad94d156ce19b9ea7d80f76be0e94541ec'
 };
