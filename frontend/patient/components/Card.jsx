@@ -12,7 +12,7 @@ export const CardContainer = ({ left, right, children }) => {
     )
 }
 
-export const RecordCard = ({ time, title, description, attachment, to }) => {
+export const Card = ({ time, title, description, attachment, to }) => {
     return (
         <CardContainer
             left={
