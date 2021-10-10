@@ -20,6 +20,9 @@ import dy35 from '@/images/medicineImg/dy35.png';
 import lianhua from '@/images/medicineImg/lianhua.png';
 import toubao from '@/images/medicineImg/toubao.png';
 import nacl from '@/images/medicineImg/nacl.png';
+import momisong from '@/images/medicineImg/momisong.jpg';
+import mianqian from '@/images/medicineImg/mianqian.jpg';
+import luganshi from '@/images/medicineImg/luganshi.jpg';
 import { useAsyncEffect } from '#/hooks/useAsyncEffect';
 import { keccak_256 } from 'js-sha3';
 import { hexToUint8Array } from '#/utils/codec';
@@ -30,7 +33,10 @@ const medicineImg = {
     '莲花清瘟': lianhua,
     '头孢': toubao,
     '生理盐水': nacl,
-    '氯化钠': nacl
+    '氯化钠': nacl,
+    '莫米松乳膏': momisong,
+    '棉签': mianqian,
+    '炉甘石洗剂': luganshi
 };
 
 export default () => {
