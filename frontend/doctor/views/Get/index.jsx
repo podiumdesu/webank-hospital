@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Paper, Snackbar, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
+import { Alert, Box, Button, Divider, Paper, Snackbar, Stack, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import { Scanner } from '#/components/Scanner';
 import React, { useEffect, useState } from 'react';
 import { Fr, GT, keyGen, reDecrypt } from '#/utils/pre';
@@ -14,73 +14,96 @@ import { ecdh } from 'secp256k1';
 import { clientConfig } from '$/config';
 import { SimpleTable } from '$/components/Table';
 
-const Record = ({ data }) => {
-    return (
-        <>
-            <SimpleTable
-                columns={['属性', '值']}
-                rows={[
-                    ['类型', '病历'],
-                    ['地址', data.address],
-                    ['单号', data.number],
-                    ['医院', data.hospital],
-                    ['科室', data.department],
-                    ['医生', data.doctor],
-                    ['姓名', data.name],
-                    ['性别', data.gender],
-                    ['年龄', data.age],
-                    ['日期', new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long' })],
-                    ['主诉', data.cc],
-                    ['既往史', data.history],
-                    ['体征', data.sign],
-                    ['诊断意见', data.diagnosis],
-                    ['诊断计划', data.plan],
-                ]}
-            />
-            <SimpleTable
-                columns={['药品名', '剂量']}
-                rows={data.drugs.map(({ drug, quantity }) => [drug, quantity])}
-            />
-            <SimpleTable
-                columns={['附件名', 'CID']}
-                rows={data.attachments.map(({ name, cid }) => [name, cid])}
-            />
-        </>
-    );
-};
+const Record = ({ data }) => (
+    <>
+        <Typography variant='h5'>基本信息</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['属性', '值']}
+            rows={[
+                ['类型', '病历'],
+                ['地址', data.address],
+                ['单号', data.number],
+                ['医院', data.hospital],
+                ['科室', data.department],
+                ['医生', data.doctor],
+                ['姓名', data.name],
+                ['性别', data.gender],
+                ['年龄', data.age],
+                ['日期', new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long' })],
+                ['主诉', data.cc],
+                ['既往史', data.history],
+                ['体征', data.sign],
+                ['诊断意见', data.diagnosis],
+                ['诊断计划', data.plan],
+            ]}
+        />
+        <Typography variant='h5'>处方</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['药品名', '剂量']}
+            rows={data.drugs.map(({ drug, quantity }) => [drug, quantity])}
+        />
+        <Typography variant='h5'>辅助检查</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['附件名', 'CID']}
+            rows={data.attachments.map(({ name, cid }) => [name, cid])}
+        />
+    </>
+);
 
-const Examination = ({ data }) => {
-    return (
-        <>
-            <SimpleTable
-                columns={['属性', '值']}
-                rows={[
-                    ['类型', '体检报告'],
-                    ['地址', data.address],
-                    ['单号', data.number],
-                    ['项目', data.project],
-                    ['机构', data.hospital],
-                    ['医生', data.doctor],
-                    ['姓名', data.name],
-                    ['性别', data.gender],
-                    ['年龄', data.age],
-                    ['日期', new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long' })],
-                ]}
-            />
-            {['general', 'internal', 'surgical', 'cbc'].map((i) => (
-                <SimpleTable
-                    key={i}
-                    columns={['项目名称', '结果', '参考值', '单位']}
-                    rows={data[i].map(({ name, result, reference, unit }) => [name, result, reference, unit])}
-                />
-            ))}
-            <SimpleTable
-                columns={['附件名', 'CID']}
-                rows={data.attachments.map(({ name, cid }) => [name, cid])}
-            />
-        </>
-    );
-};
+const Examination = ({ data }) => (
+    <>
+        <Typography variant='h5'>基本信息</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['属性', '值']}
+            rows={[
+                ['类型', '体检报告'],
+                ['地址', data.address],
+                ['单号', data.number],
+                ['项目', data.project],
+                ['机构', data.hospital],
+                ['医生', data.doctor],
+                ['姓名', data.name],
+                ['性别', data.gender],
+                ['年龄', data.age],
+                ['日期', new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long' })],
+            ]}
+        />
+        <Typography variant='h5'>一般项目</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['项目名称', '结果', '参考值', '单位']}
+            rows={data.general.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
+        />
+        <Typography variant='h5'>内科</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['项目名称', '结果', '参考值', '单位']}
+            rows={data.internal.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
+        />
+        <Typography variant='h5'>外科</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['项目名称', '结果', '参考值', '单位']}
+            rows={data.surgical.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
+        />
+        <Typography variant='h5'>血常规</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['项目名称', '结果', '参考值', '单位']}
+            rows={data.cbc.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
+        />
+        <Typography variant='h5'>详细报告</Typography>
+        <Divider />
+        <SimpleTable
+            columns={['附件名', 'CID']}
+            rows={data.attachments.map(({ name, cid }) => [name, cid])}
+        />
+    </>
+);
 
 export const Get = () => {
     const [step, setStep] = useState(0);
@@ -141,7 +164,6 @@ export const Get = () => {
             setStep(2);
             return true;
         } catch (e) {
-            console.log(e);
             setMessage(e.message);
             return false;
         }
@@ -169,8 +191,10 @@ export const Get = () => {
                 <Step>
                     <StepLabel>数据展示</StepLabel>
                     <StepContent>
-                        <Alert severity={valid ? 'success' : 'error'}>验证{valid ? '成功' : '失败'}</Alert>
-                        {data?.type === 'record' ? <Record data={data} /> : data?.type === 'examination' ? <Examination data={data} /> : null}
+                        <Stack spacing={1}>
+                            <Alert severity={valid ? 'success' : 'error'}>验证{valid ? '成功' : '失败'}</Alert>
+                            {data?.type === 'record' ? <Record data={data} /> : data?.type === 'examination' ? <Examination data={data} /> : null}
+                        </Stack>
                     </StepContent>
                 </Step>
             </Stepper>

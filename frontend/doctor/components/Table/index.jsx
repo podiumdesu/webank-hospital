@@ -7,28 +7,30 @@ import { uint8ArrayToHex } from '#/utils/codec';
 LicenseInfo.setLicenseKey(import.meta.env.VITE_MUI_LICENSE);
 
 export const SimpleTable = ({ columns, rows }) => (
-    <TableContainer>
-        <MuiTable size='small'>
-            <TableHead>
-                <TableRow>
-                    {columns.map((column, index) => (
-                        <TableCell key={index}>
-                            {column}
-                        </TableCell>
-                    ))}
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {rows.map((row, index) => (
-                    <TableRow hover key={index}>
-                        {row.map((cell, index) => (
-                            <TableCell key={index}>{cell}</TableCell>
+    <Paper>
+        <TableContainer>
+            <MuiTable size='small'>
+                <TableHead>
+                    <TableRow>
+                        {columns.map((column, index) => (
+                            <TableCell key={index} sx={{ minWidth: 70, px: 1 }}>
+                                {column}
+                            </TableCell>
                         ))}
                     </TableRow>
-                ))}
-            </TableBody>
-        </MuiTable>
-    </TableContainer>
+                </TableHead>
+                <TableBody>
+                    {rows.map((row, index) => (
+                        <TableRow hover key={index}>
+                            {row.map((cell, index) => (
+                                <TableCell key={index} sx={{ minWidth: 70, px: 1 }}>{cell}</TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </MuiTable>
+        </TableContainer>
+    </Paper>
 );
 
 export const Table = ({ rows, deleteRow, columns, title, updateRow, isValid, reset }) => {
