@@ -11,9 +11,9 @@ const DetailedMedicalRecord = loadable(() => import('@/pages/MedicalRecord/detai
 const MedicalExamination = loadable(() => import('@/pages/MedicalExamination'));
 const DetailedMedicalExamination = loadable(() => import('@/pages/MedicalExamination/detail'));
 const ReportProgress = loadable(() => import('@/pages/ReportProgress'));
-const NewAuthData = loadable(() => import('@/pages/AuthData/new'));
-const AllAuthData = loadable(() => import('@/pages/AuthData/all'));
-const DetailedAuthData = loadable(() => import('@/pages/AuthData/detail'));
+const NewData = loadable(() => import('@/pages/AuthData/new'));
+const AllData = loadable(() => import('@/pages/AuthData/all'));
+const ShareData = loadable(() => import('@/pages/AuthData/share'));
 const TraceMedicine = loadable(() => import('@/pages/TraceMedicine'));
 
 export const routes = [
@@ -68,16 +68,16 @@ export const routes = [
         title: '授权数据',
         children: [
             {
-                path: ':cid',
-                element: <DetailedAuthData />
+                path: 'share',
+                element: <ShareData />
             },
             {
                 path: 'new',
-                element: <NewAuthData />,
+                element: <NewData />,
             },
             {
                 path: '',
-                element: <AllAuthData />,
+                element: <AllData />,
             },
         ]
     },

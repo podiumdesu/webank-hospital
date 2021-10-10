@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/Card';
 import { db, stores } from '@/stores/idb';
-import { CID } from 'multiformats/cid';
 import { useAsyncEffect } from '#/hooks/useAsyncEffect';
 
 export default () => {
@@ -25,13 +24,14 @@ export default () => {
                 records
                     .concat(examinations)
                     .sort(([, a], [, b]) => new Date(b.time) - new Date(a.time))
-                    .map(([cid, { time, title, description, attachments }], _idx) => (
+                    .map(([cid, { time, title, description, attachments, sk }], _idx) => (
                         <Card
                             time={time}
                             title={title}
                             description={description}
                             attachment={attachments}
-                            to={CID.decode(cid).toString()}
+                            to='share'
+                            state={{ cid, sk }}
                             key={_idx}
                         />
                     ))
