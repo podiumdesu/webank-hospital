@@ -61,46 +61,73 @@
 
 ### 初始化
 
-各个角色申请加入联盟链。此时，各个角色均持有公私钥对，而CA（假设是某个具有公信力的组织）持有身份到公钥的mapping。
+各个角色申请加入联盟链。此时，各个角色均持有公私钥对`(PKx_ec, SKx_ec)`，由CA（假设是某个具有公信力的组织）负责对各个角色身份、签名、有效期等的认证。
 
 ### 病历流转
 
 病历在上链后只能Create/Read，不能Update/Delete。
 
-#### 患者Alice授权医生Bob Create
+#### Alice（患者）授权Bob（医生）Create
 
-1. Alice生成*新的*PRE公私钥对，将公钥发送给Bob
-2. Bob以自己的私钥（并非PRE私钥）对病历进行签名
-3. Bob生成对称密钥，并使用对称密钥加密病历与签名
-4. Bob将加密后的病历上传至IPFS，获得CID
-5. Bob使用Alice的PRE公钥加密对称密钥
-6. Bob向Alice发送CID与加密后的对称密钥
-7. Alice保存CID与对应的PRE私钥
-8. Alice以CID生成链上id，并以链上id、加密后的对称密钥调用合约
-9. 合约判断链上id是否存在
-    * 若存在，则throw
-    * 否则保存链上id与加密后的对称密钥
+1. Alice：生成*新的*PRE公私钥对`(PKa_pre, SKa_pre) = PRE.KeyGen()`
+2. Alice -> Bob：`PKa_pre`
+3. Bob：
+   1. 填写病历`m`
+   2. 以自己的私钥`SKb_ec`为病历签名：`sig = EC.Sign(SKb_ec, Hash(m))`
+   3. 生成对称密钥`DK`，加密病历：`c = Sym.Enc(DK, { m, sig })`
+   4. 以Alice的PRE公钥`PKa_pre`加密对称密钥：`DK' = PRE.Enc(PKa_pre, DK)`
+4. Bob -> IPFS：`c`
+5. IPFS：
+   1. `CID = Hash(c)`
+   2. `storage[CID] = c`
+6. IPFS -> Bob：`CID`
+7. Bob -> Alice：`CID`、`DK'`
+8. Alice：
+   1. 将`CID`与`SKa_pre`成对保存
+   2. 以`CID`生成`AID`：`AID = Hmac(CID, Hash(password + salt))`
+9. Alice -> 合约：`AID`、`DK'`
+10. 合约：判断`AID`是否存在
+     * 若存在，则throw
+     * 否则获取当前时间戳`timestamp = now()`并保存：`cas[AID] = (DK', timestamp)`
 
-#### 患者Alice Read
+#### Alice（患者）Read
 
-1. Alice根据保存的CID，生成链上id
-2. Alice以链上id调用合约，获取对应的加密后的对称密钥
-3. Alice以CID从IPFS获得加密后的病历
-4. Alice以PRE私钥解密对称密钥，以对称密钥解密病历
-5. 必要时，Alice可以从CA获取Bob对应的公钥，验证真实性
+1. Alice -> 合约：`AID = Hmac(CID, Hash(password + salt))`
+2. 合约 -> Alice：`(DK', timestamp) = cas[AID]`
+3. Alice -> IPFS：`CID`
+4. IPFS -> Alice：`c = storage[CID]`
+5. Alice：
+   1. 以PRE私钥解密对称密钥：`DK = PRE.Dec(SKa_pre, DK')`
+   2. 以对称密钥解密病历：`{ m, sig } = Sym.Dec(c, DK)`
+   3. 必要时可以从CA获取Bob对应的公钥`PKb_ec`，验证真实性：`isValid = EC.Verify(PKb_ec, Hash(m), sig)`
 
-#### 患者Alice授权医生Carol、药房Charlie或科研机构Carlos Read
+#### Alice（患者）授权Carol（医生、药房或科研机构）Read
 
-下述过程中，合约无法追踪患者授权了什么数据给谁，进而保护了患者的隐私（匿名性）。
+下述过程中，合约无法追踪Alice授权*什么数据*给了*谁*（CDH problem），进而保护了患者的隐私（匿名性）。
 
-1. Carol/Charlie/Carlos生成PRE公私钥对，将公钥发送给Alice
-2. Alice使用待授权的CID对应的PRE私钥与Carol/Charlie/Carlos的PRE公钥生成重加密密钥
-3. Alice根据CID，生成链上id，并以链上id、重加密密钥调用合约
-4. 合约使用重加密密钥重加密链上id对应的加密后的对称密钥，返回重加密后的对称密钥
-5. Alice将CID与重加密后的对称密钥发送给Carol/Charlie/Carlos
-6. Carol/Charlie/Carlos以CID从IPFS获得加密后的病历
-7. Carol/Charlie/Carlos以PRE私钥解密对称密钥，以对称密钥解密病历
-8. 必要时，Carol/Charlie/Carlos可以从CA获取Bob对应的公钥，验证真实性
+\*表示在离线场景下可以从CA处获取的数据。
+
+1. Carol：生成PRE公私钥对`(PKc_pre, SKc_pre) = PRE.KeyGen()`
+2. Carol -> Alice：`PKc_pre`(\*)、`PKc_ec`(\*)
+3. Alice：
+   1. 使用`CID`对应的PRE私钥`SKa_pre`与Carol的PRE公钥`PKc_pre`生成重加密密钥`RK = PRE.ReKeyGen(SKa_pre, PKc_pre)`
+   2. 生成`AID`：`AID = Hmac(CID, Hash(password + salt))`
+   3. 生成`BID`：`BID = EC.DH(SKa_ec, PKc_ec) xor CID`
+4. Alice -> 合约：`AID`、`BID`、`RK`
+5. 合约：
+   1. 以`AID`获取`(DK', timestamp) = cas[AID]`
+   2. 使用重加密密钥`RK`重加密`DK'`：`DK'' = PRE.ReEnc(RK, DK')`
+   3. 保存重加密后的对称密钥`DK''`：`cbs[BID] = (DK'', timestamp)`
+6. Alice -> Carol：`CID`、`PKa_ec`(\*)
+7. Carol：计算`BID = EC.DH(SKc_ec, PKa_ec) xor CID`
+8. Carol -> 合约：`BID`
+9. 合约 -> Carol：`(DK'', timestamp) = cbs[BID]`
+10. Carol -> IPFS：`CID`
+11. IPFS -> Carol：`c = storage[CID]`
+12. Carol：
+    1. 以PRE私钥解密对称密钥：`DK = PRE.ReDec(SKc_pre, DK'')`
+    2. 以对称密钥解密病历：`{ m, sig } = Sym.Dec(c, DK)`
+    3. 必要时可以从CA获取Bob对应的公钥`PKb_ec`，验证真实性：`isValid = EC.Verify(PKb_ec, Hash(m), sig)`
 
 ### 药品溯源
 
@@ -109,31 +136,35 @@
 #### 数据结构
 
 在存储时，每个药品都是一个键值对，其中键为药品的id，值为trace。
-* `id = Hash(key)`，其中key是溯源码，打印在药品包装上。只有能够物理接触药品的参与者才能获取key；
+* `id = HashZK(key)`，其中key是溯源码，打印在药品包装上。只有能够物理接触药品的参与者才能获取key；
 * trace是一个只能push的数组，其中包括以key加密后的各个环节的信息。
 
 值得注意的是，合约并不直接存储药品与其当前所有者的所有权关系，而是通过key证明（物理）所有权、通过trace记录之前的所有者（即供应链的参与者）。
 
-#### 某个环节的参与者David增加trace
+#### David（某个环节的参与者）增加trace
 
-1. David填写相关信息data，如：
-    * 生产厂商应该填写药品名、生产日期、生产厂商名等；
-    * 货运公司应该填写始发地、目的地、运输时间、货运公司名等；
-    * etc.
-2. David以自己的私钥为数据签名，以供后续环节验证：`sig = Sign(sk, Hash(data))`
-3. David加密：`c = Enc(key, { data, sig })`
-4. David生成证明，以在不泄露key的前提下证明自己拥有key：`proof = Prove(id = Hash(key))` 
-    * 如果必要，可以加入当前区块高度/hash作为nonce，以防止重放
-5. David以id、c、proof调用合约
-6. 合约验证proof：`isValid = Verify(proof, id)`
-    * 若isValid为true，则`drugs[id].push(c)`
+1. David：
+   1. 填写相关信息data，如：
+       * 生产厂商应该填写药品名、生产日期、生产厂商名等；
+       * 货运公司应该填写始发地、目的地、运输时间、货运公司名等；
+       * etc.
+   2. 以自己的私钥为数据签名，以供后续环节验证：`sig = EC.Sign(SKd_ec, Hash(data))`
+   3. 加密：`c = Sym.Enc(key, { data, sig })`
+   4. 生成证明，以在不泄露key的前提下证明自己拥有key：`proof = ZK.Prove(id = HashZK(key))` 
+       * 如果必要，可以加入当前区块高度/hash作为nonce，以防止重放
+2. David -> 合约：`id`、`c`、`proof`
+3. 合约：验证proof`isValid = ZK.Verify(proof, id)`
+    * 若验证通过，则获取当前时间戳`timestamp = now()`并保存：`drugs[id].push((c, timestamp))`
     * 否则throw
 
-#### 后续环节的参与者Erin（包括患者Alice）或政府部门Grace 查询/抽检 供应链
+#### Erin（后续环节的参与者、患者或政府部门）查询/抽检 供应链
 
-1. Erin/Grace以溯源码key计算`id = Hash(key)`，并以此调用合约，获取`drugs[id]`
-2. Erin/Grace解密：`drugs[id].map(c => { data, sig } = Dec(key, c))`
-3. 必要时，Erin/Grace可以从CA获取David对应的公钥，验证真实性
+1. Erin：以溯源码key计算`id = HashZK(key)`
+2. Erin -> 合约：`id`
+3. 合约 -> Erin：`trace = drugs[id]`
+4. Erin
+   1. 对于`trace`中的每个`(c, timestamp)`，解密`{ data, sig } = Sym.Dec(key, c)`
+   2. 必要时可以从CA获取David对应的公钥`PKd_ec`，验证真实性：`isValid = EC.Verify(PKd_ec, Hash(m), sig)`
 
 ## 核心算法
 
