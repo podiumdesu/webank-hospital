@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 import { encode } from '@ethersproject/rlp';
-import { ecdsaSign } from 'secp256k1';
+import { ecdsaSign, publicKeyCreate } from 'secp256k1';
 import { hexToUint8Array } from '#/utils/codec';
 import { keccak_256 } from 'js-sha3';
 import axios from 'axios';
@@ -9,7 +9,7 @@ import { ENDPOINT } from '#/constants';
 const addresses = {
     ca: '0xec8ec3a0a197e3fcd863a6e62cf41a8a7b67f82f',
     meta: '0x82eed2574b8e9890a819ecce2bbf5713c8308e42',
-    record: '0x8501300079e7ea715bd785d2bbafbf81ecb5db21',
+    record: '0x8ef2c734bc5ac903fcbda2bd137e1a7131ff0cbe',
     trace: '0x98db49ad94d156ce19b9ea7d80f76be0e94541ec',
 };
 
@@ -22,6 +22,10 @@ export class ClientConfig {
 
     get address() {
         return utils.computeAddress(this.privateKey);
+    }
+
+    get publicKey() {
+        return publicKeyCreate(this.privateKey);
     }
 }
 
@@ -216,39 +220,36 @@ export class API {
         this.client = new Client(config);
     }
 
-    async getRecord(id) {
-        const [key] = await this.client.call(
+    async getRecord(aid) {
+        return await this.client.call(
             addresses.record,
-            'function get(string memory id) public view returns (string[2] memory)',
-            [id],
+            'function get_ca(string memory aid) public view returns (string[2] memory, uint64)',
+            [aid],
         );
-        return key;
     }
 
-    async getRecordTime(id) {
-        const [timestamp] = await this.client.call(
+    async getReEncryptedRecord(bid) {
+        return await this.client.call(
             addresses.record,
-            'function get_timestamp(string memory id) public view returns (uint64)',
-            [id],
+            'function get_cb(string memory bid) public view returns (string[2] memory, uint64)',
+            [bid],
         );
-        return timestamp;
     }
 
-    async setRecord(id, ca) {
+    async setRecord(aid, ca) {
         await this.client.sendRawTransaction(
             addresses.record,
-            'function set(string memory id, string[2] memory key) public',
-            [id, ca],
+            'function set(string memory aid, string[2] memory ca) public',
+            [aid, ca],
         );
     }
 
-    async reEncrypt(id, rk) {
-        const [cb] = await this.client.call(
+    async reEncrypt(aid, bid, rk) {
+        await this.client.sendRawTransaction(
             addresses.record,
-            'function re_encrypt(string memory id, string memory rk) public view returns (string[2] memory)',
-            [id, rk],
+            'function re_encrypt(string memory aid, string memory bid, string memory rk) public',
+            [aid, bid, rk],
         );
-        return cb;
     }
 
     async getTrace(id) {
@@ -260,7 +261,7 @@ export class API {
         return await Promise.all([...new Array(length).keys()].map(async (i) => {
             return await this.client.call(
                 addresses.trace,
-                'function get_trace_item(string memory id, uint32 index) public view returns (string memory id, uint64)',
+                'function get_trace_item(string memory id, uint32 index) public view returns (string memory, uint64)',
                 [id, i],
             );
         }));
