@@ -82,7 +82,7 @@ export default () => {
                     </p>
                     <div className='flex justify-between text-[#60A2F8]'>
                         <div className='flex flex-col justify-between'>
-                            <p className='text-lg font-bold'>{data.name}</p>
+                            <p className='text-lg font-bold w-24'>{data.name}</p>
                             <p className='text-xs'>{data.gender}</p>
                             <p className='text-xs'>{data.age}岁</p>
                         </div>
@@ -92,7 +92,7 @@ export default () => {
                             <p className='text-xs'>病历单号: {data.number}</p>
                         </div>
                     </div>
-                    <table className='text-xs mt-5'>
+                    <table className='text-xs mt-5 mb-6'>
                         <tbody>
                             {
                                 Object.entries({
@@ -104,7 +104,7 @@ export default () => {
                                     诊断计划: data.plan,
                                 }).map(([k, v]) => (
                                     <tr key={k} className='my-2'>
-                                        <th className='text-left font-normal pr-3 py-1 text-light-black'>{k}:</th>
+                                        <th className='text-left font-normal pr-3 py-1 text-light-black w-20'>{k}:</th>
                                         <td className='text-[#25261F]'>{v}</td>
                                     </tr>
                                 ))
@@ -131,33 +131,36 @@ export default () => {
                         ))}
                     </div>
                 </div>
-                <div>
-                    <p className='text-lg font-bold text-dark-black mb-2'>
-                        <img src={magnifier} className='inline h-4 mx-1 align-middle' alt='' />
-                        辅助检查
-                    </p>
-                    <div className='bg-white w-full p-4 rounded-xl flex flex-col gap-1'>
-                        {data.attachments.map(({ name, cid, dk }, index) => (
-                            <div key={index}>
-                                <span className='text-sm text-dark-black mr-3'>{name}</span>
-                                <span className='text-2xs bg-[#AFD0FB] text-[#3C55D5] px-2 py-0.5 rounded-lg' onClick={async () => {
-                                    const buffers = [];
-                                    for await (const buffer of cat(cid)) {
-                                        buffers.push(buffer);
-                                    }
-                                    const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
-                                    const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
-                                    const url = URL.createObjectURL(new Blob([await aes.decrypt(buffer.slice(12), '', '')]));
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = name;
-                                    a.click();
-                                    URL.revokeObjectURL(url);
-                                }}>点击下载</span>
+                {
+                    data.attachments.length > 0 ?
+                        <div>
+                            <p className='text-lg font-bold text-dark-black mb-2'>
+                                <img src={magnifier} className='inline h-4 mx-1 align-middle' alt='' />
+                                辅助检查
+                            </p>
+                            <div className='bg-white w-full p-4 rounded-xl flex flex-col gap-1'>
+                                {data.attachments.map(({ name, cid, dk }, index) => (
+                                    <div key={index}>
+                                        <span className='text-sm text-dark-black mr-3'>{name}</span>
+                                        <span className='text-2xs bg-[#AFD0FB] text-[#3C55D5] px-2 py-0.5 rounded-lg' onClick={async () => {
+                                            const buffers = [];
+                                            for await (const buffer of cat(cid)) {
+                                                buffers.push(buffer);
+                                            }
+                                            const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
+                                            const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
+                                            const url = URL.createObjectURL(new Blob([await aes.decrypt(buffer.slice(12), '', '')]));
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = name;
+                                            a.click();
+                                            URL.revokeObjectURL(url);
+                                        }}>点击下载</span>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </div>
+                        </div> : (<></>)
+                }
             </div> : null}
         </div>
     );
