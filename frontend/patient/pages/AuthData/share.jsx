@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { CID } from 'multiformats/cid';
-import { db, stores } from '@/stores/idb';
-import { Fr, G2, GT, reKeyGen } from '#/utils/pre';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Fr, G2, reKeyGen } from '#/utils/pre';
 import { Scanner } from '#/components/Scanner';
 import { toDataURL } from 'qrcode';
 import { Button, Steps, Toast } from 'antd-mobile';
@@ -10,29 +8,37 @@ import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
 import { api } from '@/api';
 import { hmac } from '#/utils/hmac';
 import { useMobxStore } from '@/stores/mobx';
+import { ecdh } from 'secp256k1';
+import { clientConfig } from '@/config';
+import { uint8ArrayToHex } from '#/utils/codec';
 
 const { Step } = Steps;
 
 export default () => {
-    const { cid } = useParams();
+    const { state } = useLocation();
     const [step, setStep] = useState(0);
     const [src, setSrc] = useState('');
     const navigate = useNavigate();
     const store = useMobxStore();
+    if (!state) {
+        return null;
+    }
     const handleData = async (buffer) => {
         try {
-            const bytes = CID.parse(cid).bytes;
+            const bid = new Uint8Array(state.cid);
+            const dh = ecdh(buffer.slice(0, 33), clientConfig.privateKey);
+            for (let i = 0; i < 32; i++) {
+                bid[i + 2] ^= dh[i];
+            }
+            const aid = await hmac(state.cid, await store.hk, '');
             const sk = new Fr();
-            sk.deserialize((await db.get(stores.record, bytes)).sk);
+            sk.deserialize(state.sk);
             const pk = new G2();
-            pk.deserialize(buffer);
+            pk.deserialize(buffer.slice(33));
             const rk = reKeyGen(sk, pk);
-            const [cb0, cb1] = await api.reEncrypt(await hmac(bytes, await store.hk, ''), rk.serializeToHexStr());
-            const cb = [new Fr(), new GT()];
-            cb[0].deserializeHexStr(cb0);
-            cb[1].deserializeHexStr(cb1);
+            await api.reEncrypt(aid, uint8ArrayToHex(bid), rk.serializeToHexStr());
             setSrc(await toDataURL([{
-                data: [...bytes, ...cb[0].serialize(), ...cb[1].serialize()],
+                data: [...clientConfig.publicKey, ...state.cid],
                 mode: 'byte'
             }]));
             Toast.show({
@@ -43,26 +49,26 @@ export default () => {
             return true;
         } catch (e) {
             Toast.show({
-                icon: <CloseOutline className='mx-auto'/>,
+                icon: <CloseOutline className='mx-auto' />,
                 content: e.message,
             });
             return false;
         }
     };
     return (
-        <div className="px-4">
+        <div className='px-4'>
             <Steps current={step}>
-                <Step title="开始" />
-                <Step title="授权" />
+                <Step title='开始' />
+                <Step title='授权' />
             </Steps>
             {
                 [
-                    <div className="flex flex-col items-center">
-                        <p className="font-bold text-xl">请扫描医生的二维码</p>
+                    <div className='flex flex-col items-center'>
+                        <p className='font-bold text-xl'>请扫描医生的二维码</p>
                         <Scanner onData={handleData} />
                     </div>,
-                    <div className="flex flex-col items-center">
-                        <p className="font-bold text-xl">请出示下面的二维码</p>
+                    <div className='flex flex-col items-center'>
+                        <p className='font-bold text-xl'>请出示下面的二维码</p>
                         <img src={src} alt='' />
                         <Button onClick={() => navigate('/')}>完成</Button>
                     </div>
