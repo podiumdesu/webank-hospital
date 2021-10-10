@@ -16,36 +16,37 @@ mod medical_record {
     use super::{pre::*};
     #[liquid(storage)]
     struct MedicalRecord {
-        cas: storage::Mapping<String, [String; 2]>,
-        timestamps: storage::Mapping<String, timestamp>,
+        cas: storage::Mapping<String, ([String; 2], timestamp)>,
+        cbs: storage::Mapping<String, ([String; 2], timestamp)>,
     }
 
     #[liquid(methods)]
     impl MedicalRecord {
         pub fn new(&mut self) {
             self.cas.initialize();
-            self.timestamps.initialize();
+            self.cbs.initialize();
         }
 
-        pub fn get(&self, id: String) -> [String; 2] {
-            self.cas.get(&id).unwrap().clone()
+        pub fn get_ca(&self, aid: String) -> ([String; 2], timestamp) {
+            self.cas.get(&aid).unwrap().clone()
         }
 
-        pub fn get_timestamp(&self, id: String) -> timestamp {
-            self.timestamps.get(&id).unwrap().clone()
+        pub fn get_cb(&self, bid: String) -> ([String; 2], timestamp) {
+            self.cbs.get(&bid).unwrap().clone()
         }
 
-        pub fn set(&mut self, id: String, key: [String; 2]) {
-            if !self.cas.contains_key(&id) {
-                self.cas.insert(&id, key);
-                self.timestamps.insert(&id, self.env().now());
+        pub fn set(&mut self, aid: String, ca: [String; 2]) {
+            let now = self.env().now();
+            if !self.cas.contains_key(&aid) {
+                self.cas.insert(&aid, (ca, now));
             }
         }
 
-        pub fn re_encrypt(&self, id: String, rk: String) -> [String; 2] {
+        pub fn re_encrypt(&mut self, aid: String, bid: String, rk: String) {
             let pre = PRE::at("0x5007".parse().unwrap());
-            let key = self.cas.get(&id).unwrap();
-            [key[0].clone(), pre.reEncrypt(key[1].clone(), rk).unwrap().clone()]
+            let (key, now) = self.cas.get(&aid).unwrap();
+            let cb = [key[0].clone(), pre.reEncrypt(key[1].clone(), rk).unwrap().clone()];
+            self.cbs.insert(&bid, (cb, now.clone()));
         }
     }
 }
