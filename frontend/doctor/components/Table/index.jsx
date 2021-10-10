@@ -1,10 +1,35 @@
-import { Button, Paper, Typography } from '@mui/material';
+import { Button, Paper, Table as MuiTable, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React from 'react';
 import { Add, CancelOutlined, DeleteOutlined, EditOutlined, SaveOutlined } from '@mui/icons-material';
 import { DataGridPro, GridActionsCellItem, GridToolbarContainer, LicenseInfo, useGridApiRef } from '@mui/x-data-grid-pro';
 import { uint8ArrayToHex } from '#/utils/codec';
 
 LicenseInfo.setLicenseKey(import.meta.env.VITE_MUI_LICENSE);
+
+export const SimpleTable = ({ columns, rows }) => (
+    <TableContainer>
+        <MuiTable size='small'>
+            <TableHead>
+                <TableRow>
+                    {columns.map((column, index) => (
+                        <TableCell key={index}>
+                            {column}
+                        </TableCell>
+                    ))}
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {rows.map((row, index) => (
+                    <TableRow hover key={index}>
+                        {row.map((cell, index) => (
+                            <TableCell key={index}>{cell}</TableCell>
+                        ))}
+                    </TableRow>
+                ))}
+            </TableBody>
+        </MuiTable>
+    </TableContainer>
+);
 
 export const Table = ({ rows, deleteRow, columns, title, updateRow, isValid, reset }) => {
     const apiRef = useGridApiRef();
