@@ -1,4 +1,4 @@
-# 医链服务平台
+# 医链
 
 ## 简介
 
@@ -24,7 +24,8 @@
 * 实现了 病历/医疗/体检 数据/记录 的授权，在方便共享、流转的同时又保证了保密性与一定程度上的匿名性
 * 实现了 病历/医疗/体检 数据/记录 的认证，在支持患者跨医院/机构/药房 就医/取药 的同时也能确保其数据的真实性
 * 实现了药品的溯源，在确保药品来源可信的同时确保只有物理接触药品才能查询供应链，同时打破合约显式存储所有权的传统，进一步保证了供应链参与者与患者的隐私
-* **TODO**
+* 实现了良好的用户体验，所有链下的数据传递交互简单，均使用二维码作为数据载体，便捷且高效，用户全程私钥无感
+* 集成了IPFS，防止在节点之间同步大量的数据，减少了存储与传输负担，保证了整个区块链网络的性能
 
 ## 技术栈
 
@@ -63,7 +64,7 @@
 
 各个角色申请加入联盟链。此时，各个角色均持有公私钥对`(PKx_ec, SKx_ec)`，由CA（假设是某个具有公信力的组织）负责对各个角色身份、签名、有效期等的认证。
 
-### 病历流转
+### 病历授权
 
 病历在上链后只能Create/Read，不能Update/Delete。
 
@@ -105,7 +106,7 @@
 
 下述过程中，合约无法追踪Alice授权*什么数据*给了*谁*（CDH problem），进而保护了患者的隐私（匿名性）。
 
-\*表示在离线场景下可以从CA处获取的数据。
+`*`表示在离线场景下可以从CA处获取的数据。
 
 1. Carol：生成PRE公私钥对`(PKc_pre, SKc_pre) = PRE.KeyGen()`
 2. Carol -> Alice：`PKc_pre`(\*)、`PKc_ec`(\*)
@@ -131,7 +132,7 @@
 
 ### 药品溯源
 
-药品的供应链：生产（生产厂商） -> 运输（货运公司） -> 销售（药房） -> （患者）
+简化的药品供应链：生产（生产厂商） -> 运输（货运公司） -> 销售（药房） -> （患者）
 
 #### 数据结构
 
@@ -259,17 +260,22 @@ cd ..
 
 **TODO**
 
-### 合约
+### 编译合约
 
-**TODO**
+```bash
+cd contracts
+make
+```
 
-### 后端
+### 部署合约与后端
 
 ```bash
 cd backend
-npm install
-npm run build
-npm run start:prod
+yarn install
+yarn deploy
+yarn ca
+yarn build
+yarn start:prod
 ```
 
 ### 前端
@@ -281,7 +287,7 @@ npm run start:prod
 ```bash
 cd rust
 cargo build --release
-cp ./target/wasm32-unknown-unknown/release/rescue.wasm ../frontend/src/utils/rescue/
+cp ./target/wasm32-unknown-unknown/release/rescue.wasm ../frontend/common/src/utils/rescue/
 ```
 
 #### 打包构建用户界面
@@ -302,5 +308,7 @@ npm run start:prod
 
 ## FAQ
 
-* 为什么有后端？  
-    **TODO**
+* 为什么有后端？
+    * 本项目与私钥有关的所有操作均在前端完成，后端作为简单的RPC over HTTP Gateway，完全透明，不接触用户私钥，只起到消息转发的作用
+    * 前端支持直接访问节点的JSONRPC服务，但由于浏览器对CORS的检查愈发严格，因此后端是必要的
+    * 用户可以自行部署后端、使用其它的RPC over HTTP服务或在*不跨域*的前提下直接通过前端访问节点的JSONRPC端口
