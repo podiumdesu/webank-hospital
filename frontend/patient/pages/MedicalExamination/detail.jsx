@@ -24,7 +24,7 @@ export default () => {
         try {
             const bytes = CID.parse(cid).bytes;
             const id = await hmac(bytes, await store.hk, '');
-            const [ca0, ca1] = await api.getRecord(id);
+            const [[ca0, ca1], timestamp] = await api.getRecord(id);
             const ca = [new Fr(), new G1()];
             ca[0].deserializeHexStr(ca0);
             ca[1].deserializeHexStr(ca1);
@@ -44,7 +44,7 @@ export default () => {
                 recid + 27,
                 hexToUint8Array(signature.slice(0, 64)),
                 hexToUint8Array(signature.slice(64)),
-                await api.getRecordTime(id),
+                timestamp,
             ));
             console.log(data);
             setData(data);
