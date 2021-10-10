@@ -4,6 +4,7 @@ import cors from 'fastify-cors';
 import { clientConfig, addresses } from './config';
 import { Web3jService } from './contract-sdk';
 import { channelPromise, MESSAGE_TYPE } from './contract-sdk/network';
+import { randomInt } from 'crypto';
 
 const web3j = new Web3jService(clientConfig);
 const server = fastify({
@@ -12,6 +13,22 @@ const server = fastify({
 });
 
 server.register(cors);
+
+const { nodes, authentication, timeout } = clientConfig;
+
+server.post<{ Body: { method: string, params: unknown[], isQuery: boolean } }>('/rpc', async ({ body: { method, params, isQuery } }, res) => {
+    res.send(await channelPromise(
+        { jsonrpc: '2.0', method, params, id: 1 },
+        isQuery ? MESSAGE_TYPE.QUERY : MESSAGE_TYPE.CHANNEL_RPC_REQUEST,
+        nodes[randomInt(nodes.length)],
+        authentication,
+        timeout
+    ));
+});
+
+server.listen(5000);
+
+/* Deprecated */
 
 server.get<{ Params: { id: string } }>('/records/:id', async ({ params: { id } }, res) => {
     const [key] = await web3j.call(
@@ -69,17 +86,3 @@ server.post<{ Params: { id: string }, Body: { c: string, proof: string } }>('/tr
         [id, c, proof],
     ));
 });
-
-const { nodes, authentication, timeout } = clientConfig;
-
-server.post<{ Body: { method: string, params: unknown[], isQuery: boolean } }>('/rpc', async ({ body: { method, params, isQuery } }, res) => {
-    res.send(await channelPromise(
-        { jsonrpc: '2.0', method, params, id: 1 },
-        isQuery ? MESSAGE_TYPE.QUERY : MESSAGE_TYPE.CHANNEL_RPC_REQUEST,
-        nodes[~~(Math.random() * nodes.length)],
-        authentication,
-        timeout
-    ));
-});
-
-server.listen(5000);
