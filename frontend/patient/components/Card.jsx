@@ -12,7 +12,7 @@ export const CardContainer = ({ left, right, children }) => {
     )
 }
 
-export const Card = ({ time, title, description, attachment, to }) => {
+export const Card = ({ time, title, description, attachment, to, state = null }) => {
     return (
         <CardContainer
             left={
@@ -24,7 +24,7 @@ export const Card = ({ time, title, description, attachment, to }) => {
             }
             right={
                 <div className='flex items-center'>
-                    <Link to={to}><RightOutline className='text-6178EE' /></Link>
+                    <Link to={to} state={state}><RightOutline className='text-6178EE' /></Link>
                 </div>
             }
         >
