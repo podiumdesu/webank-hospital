@@ -91,12 +91,7 @@ export default () => {
                         </tbody>
                     </table>
                 </div>
-                {[
-                    { title: '一般项目', field: 'general' },
-                    { title: '内科', field: 'internal' },
-                    { title: '外科', field: 'surgical' },
-                    { title: '血常规', field: 'cbc' },
-                ].map(({ title, field }) => (
+                {Object.entries({ general: '一般项目', internal: '内科', surgical: '外科', cbc: '血常规'}).map(([field, title]) => (
                     <div key={field}>
                         <p className='text-lg font-bold text-dark-black mb-2'>
                             <img src={magnifier} className='inline h-4 mx-1 align-middle' alt='' />

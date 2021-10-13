@@ -1,4 +1,4 @@
-import { Button, Paper, Table as MuiTable, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Button, Table as MuiTable, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React from 'react';
 import { Add, CancelOutlined, DeleteOutlined, EditOutlined, SaveOutlined } from '@mui/icons-material';
 import { DataGridPro, GridActionsCellItem, GridToolbarContainer, LicenseInfo, useGridApiRef } from '@mui/x-data-grid-pro';
@@ -7,30 +7,28 @@ import { uint8ArrayToHex } from '#/utils/codec';
 LicenseInfo.setLicenseKey(import.meta.env.VITE_MUI_LICENSE);
 
 export const SimpleTable = ({ columns, rows }) => (
-    <Paper>
-        <TableContainer>
-            <MuiTable size='small'>
-                <TableHead>
-                    <TableRow>
-                        {columns.map((column, index) => (
-                            <TableCell key={index} sx={{ minWidth: 70, px: 1 }}>
-                                {column}
-                            </TableCell>
+    <TableContainer>
+        <MuiTable size='small'>
+            <TableHead>
+                <TableRow>
+                    {columns.map((column, index) => (
+                        <TableCell key={index} sx={{ minWidth: 70, px: 1 }}>
+                            {column}
+                        </TableCell>
+                    ))}
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {rows.map((row, index) => (
+                    <TableRow hover key={index}>
+                        {row.map((cell, index) => (
+                            <TableCell key={index} sx={{ minWidth: 70, px: 1 }}>{cell}</TableCell>
                         ))}
                     </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows.map((row, index) => (
-                        <TableRow hover key={index}>
-                            {row.map((cell, index) => (
-                                <TableCell key={index} sx={{ minWidth: 70, px: 1 }}>{cell}</TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </MuiTable>
-        </TableContainer>
-    </Paper>
+                ))}
+            </TableBody>
+        </MuiTable>
+    </TableContainer>
 );
 
 export const Table = ({ rows, deleteRow, columns, title, updateRow, isValid, reset }) => {
@@ -64,73 +62,71 @@ export const Table = ({ rows, deleteRow, columns, title, updateRow, isValid, res
     };
 
     return (
-        <Paper>
-            <DataGridPro
-                rows={rows}
-                columns={columns.map((column) => ({
-                    flex: 1,
-                    editable: true,
-                    ...column,
-                })).concat({
-                    field: 'actions',
-                    type: 'actions',
-                    headerName: '操作',
-                    getActions: ({ id }) => apiRef.current.getRowMode(id) === 'edit' ? [
-                        <GridActionsCellItem
-                            icon={<SaveOutlined />}
-                            label='Save'
-                            onClick={handleSaveClick(id)}
-                            color='primary'
-                            disabled={!isValid}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelOutlined />}
-                            label='Cancel'
-                            onClick={handleCancelClick(id)}
-                            color='primary'
-                        />,
-                    ] : [
-                        <GridActionsCellItem
-                            icon={<EditOutlined />}
-                            label='Edit'
-                            onClick={handleEditClick(id)}
-                            color='primary'
-                        />,
-                        <GridActionsCellItem
-                            icon={<DeleteOutlined />}
-                            label='Delete'
-                            onClick={handleDeleteClick(id)}
-                            color='primary'
-                        />,
-                    ],
-                })}
-                apiRef={apiRef}
-                editMode='row'
-                onRowEditStart={(_, event) => event.defaultMuiPrevented = true}
-                onRowEditStop={(_, event) => event.defaultMuiPrevented = true}
-                components={{
-                    Toolbar: () => (
-                        <GridToolbarContainer style={{ paddingLeft: 16, paddingRight: 16 }}>
-                            <Typography variant='h5' flex={1}>{title}</Typography>
-                            <Button color='primary' startIcon={<Add />} onClick={() => {
-                                const id = uint8ArrayToHex(crypto.getRandomValues(new Uint8Array(16)));
-                                apiRef.current.updateRows([{ id, isNew: true }]);
-                                apiRef.current.setRowMode(id, 'edit');
-                                setTimeout(() => {
-                                    apiRef.current.scrollToIndexes({
-                                        rowIndex: apiRef.current.getRowsCount() - 1,
-                                    });
+        <DataGridPro
+            rows={rows}
+            columns={columns.map((column) => ({
+                flex: 1,
+                editable: true,
+                ...column,
+            })).concat({
+                field: 'actions',
+                type: 'actions',
+                headerName: '操作',
+                getActions: ({ id }) => apiRef.current.getRowMode(id) === 'edit' ? [
+                    <GridActionsCellItem
+                        icon={<SaveOutlined />}
+                        label='Save'
+                        onClick={handleSaveClick(id)}
+                        color='primary'
+                        disabled={!isValid}
+                    />,
+                    <GridActionsCellItem
+                        icon={<CancelOutlined />}
+                        label='Cancel'
+                        onClick={handleCancelClick(id)}
+                        color='primary'
+                    />,
+                ] : [
+                    <GridActionsCellItem
+                        icon={<EditOutlined />}
+                        label='Edit'
+                        onClick={handleEditClick(id)}
+                        color='primary'
+                    />,
+                    <GridActionsCellItem
+                        icon={<DeleteOutlined />}
+                        label='Delete'
+                        onClick={handleDeleteClick(id)}
+                        color='primary'
+                    />,
+                ],
+            })}
+            apiRef={apiRef}
+            editMode='row'
+            onRowEditStart={(_, event) => event.defaultMuiPrevented = true}
+            onRowEditStop={(_, event) => event.defaultMuiPrevented = true}
+            components={{
+                Toolbar: () => (
+                    <GridToolbarContainer style={{ paddingLeft: 16, paddingRight: 16 }}>
+                        <Typography variant='h5' flex={1}>{title}</Typography>
+                        <Button color='primary' startIcon={<Add />} onClick={() => {
+                            const id = uint8ArrayToHex(crypto.getRandomValues(new Uint8Array(16)));
+                            apiRef.current.updateRows([{ id, isNew: true }]);
+                            apiRef.current.setRowMode(id, 'edit');
+                            setTimeout(() => {
+                                apiRef.current.scrollToIndexes({
+                                    rowIndex: apiRef.current.getRowsCount() - 1,
                                 });
-                            }}>
-                                增加
-                            </Button>
-                        </GridToolbarContainer>
-                    ),
-                    Footer: () => null
-                }}
-                autoHeight
-                disableSelectionOnClick
-            />
-        </Paper>
+                            });
+                        }}>
+                            增加
+                        </Button>
+                    </GridToolbarContainer>
+                ),
+                Footer: () => null
+            }}
+            autoHeight
+            disableSelectionOnClick
+        />
     );
 };

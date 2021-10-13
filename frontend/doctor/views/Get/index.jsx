@@ -1,6 +1,6 @@
 import { Alert, Box, Button, Divider, Paper, Snackbar, Stack, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import { Scanner } from '#/components/Scanner';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { Fr, GT, keyGen, reDecrypt } from '#/utils/pre';
 import { h } from '#/constants';
 import { toDataURL } from 'qrcode';
@@ -72,30 +72,16 @@ const Examination = ({ data }) => (
                 ['日期', new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long' })],
             ]}
         />
-        <Typography variant='h5'>一般项目</Typography>
-        <Divider />
-        <SimpleTable
-            columns={['项目名称', '结果', '参考值', '单位']}
-            rows={data.general.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
-        />
-        <Typography variant='h5'>内科</Typography>
-        <Divider />
-        <SimpleTable
-            columns={['项目名称', '结果', '参考值', '单位']}
-            rows={data.internal.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
-        />
-        <Typography variant='h5'>外科</Typography>
-        <Divider />
-        <SimpleTable
-            columns={['项目名称', '结果', '参考值', '单位']}
-            rows={data.surgical.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
-        />
-        <Typography variant='h5'>血常规</Typography>
-        <Divider />
-        <SimpleTable
-            columns={['项目名称', '结果', '参考值', '单位']}
-            rows={data.cbc.map(({ name, result, reference, unit }) => [name, result, reference, unit])}
-        />
+        {Object.entries({ general: '一般项目', internal: '内科', surgical: '外科', cbc: '血常规'}).map(([field, title]) => (
+            <Fragment key={field}>
+                <Typography variant='h5'>{title}</Typography>
+                <Divider />
+                <SimpleTable
+                    columns={['项目名称', '结果', '参考值', '单位']}
+                    rows={data[field].map(({ name, result, reference, unit }) => [name, result, reference, unit])}
+                />
+            </Fragment>
+        ))}
         <Typography variant='h5'>详细报告</Typography>
         <Divider />
         <SimpleTable

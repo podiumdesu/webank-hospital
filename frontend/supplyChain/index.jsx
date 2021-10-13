@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { render } from 'react-dom';
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Alert,
     Button,
     CssBaseline,
@@ -12,21 +15,24 @@ import {
     StepLabel,
     Stepper,
     TextField,
-    ThemeProvider
+    ThemeProvider,
+    Typography
 } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 import { Input } from '$/components/Textfields/Input';
 import { useForm } from 'react-hook-form';
 import { LocalizationProvider } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { keccak_256 } from 'js-sha3';
-import { hexToUint8Array, uint8ArrayToBase64, uint8ArrayToHex } from '#/utils/codec';
+import { base64ToUint8Array, hexToUint8Array, uint8ArrayToBase64, uint8ArrayToHex } from '#/utils/codec';
 import { ecdsaSign } from 'secp256k1';
 import { AES } from '#/utils/aes';
 import { hash, prove } from '#/utils/rescue';
-import { Table } from '$/components/Table';
+import { SimpleTable, Table } from '$/components/Table';
 import { API, ClientConfig } from '#/api/v2';
 import { Scanner } from '#/components/Scanner';
+import { api } from '@/api'; // TODO: shouldn't import api from @
 
 const getDefaultValue = () => ({
     name: '',
@@ -45,6 +51,7 @@ const App = () => {
     const [privateKey, setPrivateKey] = useState(identities[0].privateKey);
     const [tracingCode, setTracingCode] = useState();
     const [message, setMessage] = useState('');
+    const [trace, setTrace] = useState([]);
     const {
         control,
         formState: { isValid },
@@ -62,10 +69,24 @@ const App = () => {
         }
         setMessage('');
     };
-    const handleData = (data) => {
+    const handleData = async (data) => {
         if (data.length >= 32) {
-            setTracingCode(data.slice(0, 32));
-            setStep(2);
+            const tracingCode = data.slice(0, 32);
+            setTracingCode(tracingCode);
+            const id = hash(new Uint8Array(32).fill(0), tracingCode);
+            const trace = await api.getTrace(uint8ArrayToHex(id));
+            setTrace(await Promise.all(trace.map(async ([item, timestamp]) => {
+                const buffer = base64ToUint8Array(item);
+                const aes = new AES(await AES.convertKey(uint8ArrayToHex(tracingCode)), buffer.slice(0, 12));
+                const { data, signature, recid } = JSON.parse(await aes.decrypt(buffer.slice(12), ''));
+                return {
+                    data,
+                    signature,
+                    recid,
+                    timestamp,
+                };
+            })));
+            setStep(1);
             return true;
         } else {
             setMessage('Invalid tracing code');
@@ -99,31 +120,9 @@ const App = () => {
         } catch (e) {
             setMessage(e.message);
         }
-    }
+    };
     return (
         <Stepper activeStep={step} orientation='vertical' sx={{ p: 1, m: 1 }}>
-            <Step>
-                <StepLabel>选择身份</StepLabel>
-                <StepContent>
-                    <Stack spacing={1} direction='row'>
-                        <TextField
-                            select
-                            label='我是'
-                            size='small'
-                            value={privateKey}
-                            fullWidth
-                            onChange={({ target }) => setPrivateKey(target.value)}
-                        >
-                            {identities.map(({ name, privateKey }) => (
-                                <MenuItem key={name} value={privateKey}>
-                                    {name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <Button fullWidth onClick={() => setStep(1)} sx={{ flex: 0 }}>下一步</Button>
-                    </Stack>
-                </StepContent>
-            </Step>
             <Step>
                 <StepLabel>扫描溯源码</StepLabel>
                 <StepContent>
@@ -133,43 +132,65 @@ const App = () => {
             <Step>
                 <StepLabel>数据上链</StepLabel>
                 <StepContent>
-                    <Stack spacing={1}>
-                        <Table
-                            columns={[
-                                {
-                                    field: 'name',
-                                    headerName: '属性',
-                                },
-                                {
-                                    field: 'value',
-                                    headerName: '值',
-                                },
-                            ].map(({ field, headerName }) => ({
-                                field,
-                                headerName,
-                                renderEditCell: () => (
-                                    <Input
-                                        name={field}
-                                        label={headerName}
-                                        control={control}
-                                        variant='standard'
-                                        fullWidth
-                                        sx={{ mx: 1 }}
-                                    />
-                                )
-                            }))}
-                            rows={props}
-                            title='本环节数据'
-                            deleteRow={(id) => setProps(props.filter((prop) => prop.id !== id))}
-                            updateRow={(id) => handleSubmit((data) => {
-                                setProps((props) => [...props, { id, ...data }]);
-                                handleReset();
-                            })()}
-                            isValid={isValid}
-                            reset={handleReset}
-                        />
-                        <Button fullWidth disabled={!props.length} onClick={handlePost}>提交</Button>
-                    </Stack>
+                    {trace.map(({ data }, index) => (
+                        <Accordion key={index}>
+                            <AccordionSummary expandIcon={<ExpandMore />}>
+                                <Typography>{data.name}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <SimpleTable columns={['属性', '值']} rows={Object.entries(data)} />
+                            </AccordionDetails>
+                        </Accordion>
+                    ))}
+                    <Accordion defaultExpanded={true}>
+                        <AccordionSummary expandIcon={<ExpandMore />}>
+                            <Typography>新节点</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Stack spacing={1}>
+                                <TextField
+                                    select
+                                    label='我是'
+                                    size='small'
+                                    value={privateKey}
+                                    fullWidth
+                                    onChange={({ target }) => setPrivateKey(target.value)}
+                                >
+                                    {identities.map(({ name, privateKey }) => (
+                                        <MenuItem key={name} value={privateKey}>
+                                            {name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <Table
+                                    columns={Object.entries({ name: '属性', value: '值' }).map(([field, headerName]) => ({
+                                        field,
+                                        headerName,
+                                        renderEditCell: () => (
+                                            <Input
+                                                name={field}
+                                                label={headerName}
+                                                control={control}
+                                                variant='standard'
+                                                fullWidth
+                                                sx={{ mx: 1 }}
+                                            />
+                                        )
+                                    }))}
+                                    rows={props}
+                                    title='本环节数据'
+                                    deleteRow={(id) => setProps(props.filter((prop) => prop.id !== id))}
+                                    updateRow={(id) => handleSubmit((data) => {
+                                        setProps((props) => [...props, { id, ...data }]);
+                                        handleReset();
+                                    })()}
+                                    isValid={isValid}
+                                    reset={handleReset}
+                                />
+                                <Button fullWidth disabled={!props.length} onClick={handlePost}>提交</Button>
+                            </Stack>
+                        </AccordionDetails>
+                    </Accordion>
                 </StepContent>
             </Step>
             <Snackbar open={!!message} autoHideDuration={6000} onClose={handleClose}>

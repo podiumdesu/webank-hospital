@@ -1,4 +1,4 @@
-import { Divider, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Divider, Box, Stack, TextField, Typography } from '@mui/material';
 import { Input } from '$/components/Textfields/Input';
 import { Controller } from 'react-hook-form';
 import { MobileDatePicker } from '@mui/lab';
@@ -6,7 +6,7 @@ import React from 'react';
 
 export const Basic = ({ control }) => {
     return (
-        <Paper sx={{ px: 2, py: 1 }}>
+        <Box sx={{ px: 2, py: 1 }}>
             <Typography variant='h5' gutterBottom>基本信息</Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={2}>
@@ -37,6 +37,6 @@ export const Basic = ({ control }) => {
                 <Input name='diagnosis' label='诊断意见' control={control} multiline rows={3} />
                 <Input name='plan' label='诊断计划' control={control} multiline rows={3} />
             </Stack>
-        </Paper>
+        </Box>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Stack } from '@mui/material';
+import { Button, Paper, Stack } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { randomHexString } from '#/utils/random';
 import { Basic } from './Basic';
@@ -51,10 +51,12 @@ export const EditRecord = () => {
     };
     return (
         <Stack spacing={1} flex='1' overflow='auto' p={1} component='form' onSubmit={handleSubmit(onSubmit)}>
-            <Basic control={control} isValid={isValid} />
-            <Prescription drugs={drugs} setDrugs={setDrugs} />
-            <Attachment attachments={attachments} setAttachments={setAttachments} title='辅助检查' />
-            <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />
+            {[
+                <Basic control={control} isValid={isValid} />,
+                <Prescription drugs={drugs} setDrugs={setDrugs} />,
+                <Attachment attachments={attachments} setAttachments={setAttachments} title='辅助检查' />,
+            ].map((element, index) => <Paper key={index}>{element}</Paper>)}
+            <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />,
             <Button
                 disabled={!isValid}
                 variant='contained'
