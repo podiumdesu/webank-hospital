@@ -43,7 +43,7 @@ export default () => {
     const { cid } = useParams();
     const store = useMobxStore();
     const [data, setData] = useState();
-    const [valid, setValid] = useState(false);
+    const [valid, setValid] = useState();
     useAsyncEffect(async () => {
         try {
             const bytes = CID.parse(cid).bytes;
@@ -62,6 +62,7 @@ export default () => {
             const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());
             const aes = new AES(await AES.convertKey(dk), buffer.slice(0, 12));
             const { data, signature, recid } = JSON.parse(await aes.decrypt(buffer.slice(12), ''));
+            setData(data);
             setValid(await api.verify(
                 data.address,
                 keccak_256.update(JSON.stringify(data)).array(),
@@ -70,8 +71,6 @@ export default () => {
                 hexToUint8Array(signature.slice(64)),
                 timestamp,
             ));
-            setData(data);
-            console.log(data)
         } catch (e) {
             Toast.show({
                 icon: <CloseOutline className='mx-auto' />,
@@ -84,11 +83,11 @@ export default () => {
             {data ? <div className='flex flex-col gap-5 p-4'>
                 <div className='bg-white w-full p-4 rounded-xl relative'>
                     <p className='absolute bottom-0 right-0 rounded-br-lg rounded-tl-lg p-1 px-3 z-20 text-xs text-dark-black bg-[#FBCD6F]'>
-                        签名验证{valid ? '成功' : '失败'}
+                        签名验证{valid === undefined ? '中…' : valid ? '成功' : '失败'}
                     </p>
                     <div className='flex justify-between text-[#60A2F8]'>
                         <div className='flex flex-col justify-between'>
-                            <p className='text-lg font-bold w-24'>{data.name}</p>
+                            <p className='text-lg font-bold'>{data.name}</p>
                             <p className='text-xs'>{data.gender}</p>
                             <p className='text-xs'>{data.age}岁</p>
                         </div>
@@ -98,7 +97,7 @@ export default () => {
                             <p className='text-xs'>病历单号: {data.number}</p>
                         </div>
                     </div>
-                    <table className='text-xs mt-5 mb-6'>
+                    <table className='text-xs mt-4'>
                         <tbody>
                             {
                                 Object.entries({
