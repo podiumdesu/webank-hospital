@@ -60,7 +60,7 @@ export default () => {
                 [
                     <div className='flex flex-col items-center'>
                         <p className='font-bold text-xl'>请扫描药品包装上的溯源码</p>
-                        <Scanner onData={handleData} />
+                        <Scanner onData={handleData}  className='rounded-xl' />
                     </div>,
                     <div className="flex flex-col items-center">
                         {trace.map(({ data, valid }, index) => (
@@ -77,7 +77,7 @@ export default () => {
                                 </Form>
                             </div>
                         ))}
-                        <Button onClick={() => navigate('/')}>完成</Button>
+                        <Button className='text-[#61A1F8] border-[#61A1F8]' onClick={() => navigate('/')}>完成</Button>
                     </div>
                 ][step]
             }

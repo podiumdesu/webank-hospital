@@ -140,15 +140,16 @@ export default () => {
                     <div className='flex flex-col items-center'>
                         <p className='font-bold text-xl'>请出示下面的二维码</p>
                         <img src={src} alt='' />
-                        <Button onClick={() => setStep(1)}>下一步</Button>
+                        <Button className='text-[#61A1F8] border-[#61A1F8]' onClick={() => setStep(1)}>下一步</Button>
                     </div>,
-                    <div className='flex flex-col items-center'>
+                    <div className='flex flex-col items-center gap-2'>
                         <p className='font-bold text-xl'>请扫描医生的二维码</p>
-                        <Scanner onData={handleData} />
+                        <Scanner onData={handleData} className='rounded-xl' />
                     </div>,
                     <Form
+                        className='flex flex-col items-center gap-2'
                         layout='horizontal'
-                        footer={<Button className='mt-2' block onClick={handleUpload}>数据上链</Button>}
+                        footer={<Button className='text-[#61A1F8] border-[#61A1F8]' onClick={handleUpload}>数据上链</Button>}
                     >
                         <Form.Item label='时间'>
                             {data ? new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long', timeStyle: 'medium' }) : ''}
