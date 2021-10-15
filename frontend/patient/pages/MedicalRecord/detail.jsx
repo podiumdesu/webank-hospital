@@ -87,14 +87,14 @@ export default () => {
                     </p>
                     <div className='flex justify-between text-[#60A2F8]'>
                         <div className='flex flex-col justify-between'>
-                            <p className='text-lg font-bold'>{data.name}</p>
+                            <p className='text-lg font-bold w-max'>{data.name}</p>
                             <p className='text-xs'>{data.gender}</p>
                             <p className='text-xs'>{data.age}岁</p>
                         </div>
-                        <div className='flex flex-col justify-between text-right'>
+                        <div className='flex flex-col justify-between text-right min-w-0'>
                             <p className='text-sm font-bold'>{new Date(data.time).toLocaleString('zh-CN', { dateStyle: 'long' })}</p>
                             <p className='text-sm font-bold'>{data.hospital}</p>
-                            <p className='text-xs'>病历单号: {data.number}</p>
+                            <p className='text-xs truncate'>病历单号: {data.number}</p>
                         </div>
                     </div>
                     <table className='text-xs mt-4'>
