@@ -65,7 +65,7 @@
 
 ## 系统架构
 
-![image.png](https://i.loli.net/2021/10/15/UoVOCD7SnZArw15.png)
+![image.png](https://i.loli.net/2021/10/15/pzXsgIKx2FEQWa7.png)
 
 ## 技术栈
 
