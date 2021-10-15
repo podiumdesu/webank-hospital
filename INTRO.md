@@ -78,7 +78,11 @@
 
 ## 四、技术开发方案
 
-### （1）技术栈
+### （1）系统架构
+
+![image.png](https://i.loli.net/2021/10/15/UoVOCD7SnZArw15.png)
+
+### （2）技术栈
 
 * 前端
   * React
@@ -105,7 +109,7 @@
   * 存储
     * IPFS
 
-### （2）流程
+### （3）流程
 
 #### 1. 初始化
 
@@ -215,7 +219,7 @@
    1. 对于`trace`中的每个`(c, timestamp)`，解密`{ data, sig } = Sym.Dec(key, c)`
    2. 必要时可以从CA获取David对应的公钥`PKd_ec`，验证真实性：`isValid = EC.Verify(PKd_ec, Hash(m), sig)`
 
-### （3）核心算法
+### （4）核心算法
 
 #### 1. 代理重加密
 
@@ -295,6 +299,93 @@ zk-STARK全称为*Zero-Knowledge Scalable Transparent Arguments of Knowledge*，
 除了**无需可信初始化**外，zk-STARK不使用椭圆曲线与配对密码学，而是使用哈希函数与信息论作为安全性保证，实现了**后量子安全**。
 
 同时，为了证明用户确实拥有某些知识，本作品使用了Rescue Hash。Rescue Hash是专门为zk-STARK优化的抗碰撞密码学哈希函数，在保证安全性的同时极大程度上提高了在数字电路上的性能。
+
+### （5）部署
+
+#### 1. 包含预编译合约的区块链网络
+
+注意，从源码编译应使用系统包管理器安装必要的依赖。具体的依赖项可以通过*Trial and error*方法得知。
+
+```bash
+git clone https://github.com/winderica/FISCO-BCOS
+cd FISCO-BCOS
+mkdir build
+cd build
+cmake ..
+make
+cd ..
+./tools/build_chain.sh -l 127.0.0.1:2 -e build/bin/fisco-bcos
+./nodes/127.0.0.1/start_all.sh
+```
+
+我们还配置了GitHub Actions，下载最新的artifact请访问[这里](https://github.com/winderica/FISCO-BCOS/actions )。
+
+解压后，获取[build_chain.sh](https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v2.8.0/build_chain.sh )，并运行：
+
+```bash
+./build_chain.sh -l 127.0.0.1:2 -e <path>/<to>/fisco-bcos
+./nodes/127.0.0.1/start_all.sh
+```
+
+#### 2. 编译合约
+
+请预先安装rust相关工具链与`cargo-liquid`。
+
+```bash
+cd contracts
+make
+```
+
+#### 3. 部署合约与后端
+
+1. 安装依赖：
+```bash
+cd backend
+yarn
+```
+2. 修改`src/config/index.ts`中`baseConfig`的各个字段
+3. 部署合约：
+```bash
+yarn deploy
+```
+4. 修改`src/config/index.ts`中`addresses`的各个字段
+5. CA初始化各个成员：
+```bash
+yarn ca
+```
+6. 构建并运行：
+```bash
+yarn build
+yarn start:prod
+```
+
+#### 4. 部署前端
+
+##### 编译WebAssembly
+
+虽然项目中已经存在预编译的WebAssembly文件，但为确保万无一失，可以自行编译。
+
+```bash
+cd rust
+cargo build --release
+cp ./target/wasm32-unknown-unknown/release/rescue.wasm ../frontend/common/utils/rescue/
+```
+
+##### 打包构建用户界面
+
+```bash
+cd frontend
+npm install
+npm run build
+npm run start:prod
+```
+
+注意：
+* 本项目大量使用了WebCrypto等Web API，这些API只允许在HTTPS或localhost下使用；
+* 本项目大量使用了WebAssembly、ES Module、Top-level Await等较新的特性，旧版本的浏览器可能不支持这些特性；
+* 本项目的UI只适配移动端。
+
+如有问题，请检查上述条件是否满足。
 
 ## 五、商业应用场景及价值
 
