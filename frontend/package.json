@@ -9,11 +9,13 @@
     "@mui/icons-material": "^5.0.0",
     "@mui/lab": "^5.0.0-alpha.47",
     "@mui/material": "^5.0.0",
+    "@mui/styles": "^5.0.1",
     "@mui/x-data-grid-pro": "^5.0.0-beta.3",
     "antd-mobile": "^5.0.0-beta.14",
     "axios": "^0.21.4",
     "date-fns": "^2.24.0",
     "ethers": "^5.4.7",
+    "history": "^5.0.1",
     "idb": "^6.1.4",
     "ipfs-core": "^0.11.0",
     "jsqr": "^1.4.0",
@@ -37,5 +39,17 @@
     "start:dev": "vite",
     "build": "vite build",
     "start:prod": "vite preview"
+  },
+  "resolutions": {
+    "@motrix/nat-api": "featherin/empty",
+    "randombytes": "featherin/randombytes",
+    "electron-fetch": "featherin/empty",
+    "mortice": "featherin/mortice",
+    "readable-stream": "featherin/readable-stream",
+    "levelup": "featherin/levelup",
+    "level-js": "featherin/level-js",
+    "ipfs-utils": "featherin/js-ipfs-utils",
+    "engine.io-client": "featherin/engine.io-client",
+    "dns-over-http-resolver": "featherin/dns-over-http-resolver"
   }
 }
