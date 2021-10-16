@@ -207,7 +207,7 @@ const createMutex = (name, options) => {
     }
 }
 
-module.exports = (name, options) => {
+export default (name, options) => {
     if (!options) {
         options = {}
     }
@@ -259,7 +259,7 @@ module.exports = (name, options) => {
     return mutexes[name]
 }
 
-module.exports.Worker = function (script, Impl) {
+export const Worker = function (script, Impl) {
     Impl = Impl || globalThis.Worker
     let worker
 
