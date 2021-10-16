@@ -23,7 +23,21 @@ export default defineConfig({
         doctor: resolve(__dirname, 'doctor.html'),
         patient: resolve(__dirname, 'patient.html'),
         supplyChain: resolve(__dirname, 'supplyChain.html'),
-      }
+      },
+      output: {
+        manualChunks: {
+          react: ['react'],
+          'react-dom': ['react-dom'],
+          'react-router': ['react-router-dom'],
+          'mui-core': ['@mui/material'],
+          'mui-lab': ['@mui/lab'],
+          'mui-icons': ['@mui/icons-material'],
+          antd: ['antd-mobile'],
+          ipfs: ['ipfs-core'],
+          ethers: ['ethers'],
+          axios: ['axios'],
+        },
+      },
     }
   }
 });
