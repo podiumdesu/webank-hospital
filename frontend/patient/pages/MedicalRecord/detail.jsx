@@ -97,7 +97,7 @@ export default () => {
                             <p className='text-xs truncate'>病历单号: {data.number}</p>
                         </div>
                     </div>
-                    <table className='text-xs mt-4'>
+                    <table className='text-xs mt-4 mb-2'>
                         <tbody>
                             {
                                 Object.entries({
