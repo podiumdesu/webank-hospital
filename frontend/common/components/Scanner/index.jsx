@@ -9,7 +9,14 @@ export const Scanner = ({ onData, className }) => {
         }
         const video = document.createElement("video");
         const canvas = node.getContext("2d");
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                facingMode: "environment",
+                width: { min: 1280 },
+                height: { min: 720 },
+            }
+        });
         setStream(stream);
         const tick = async () => {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
