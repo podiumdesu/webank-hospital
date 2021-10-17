@@ -5,7 +5,6 @@ import { Fr, GT, keyGen, reDecrypt } from '#/utils/pre';
 import { h } from '#/constants';
 import { toDataURL } from 'qrcode';
 import { CID } from 'multiformats/cid';
-import { cat } from '#/utils/ipfs';
 import { AES } from '#/utils/aes';
 import { api } from '$/api';
 import { keccak_256 } from 'js-sha3';
@@ -120,6 +119,7 @@ export const Get = () => {
                 bid[i + 2] ^= dh[i];
             }
             const buffers = [];
+            const { cat } = await import('#/utils/ipfs');
             for await (const buffer of cat(CID.decode(data.slice(33)))) {
                 buffers.push(buffer);
             }

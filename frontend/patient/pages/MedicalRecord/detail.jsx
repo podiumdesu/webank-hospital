@@ -4,7 +4,6 @@ import { CloseOutline } from 'antd-mobile-icons';
 import { useParams } from 'react-router-dom';
 
 import { CID } from 'multiformats/cid';
-import { cat } from '#/utils/ipfs';
 import { db, stores } from '@/stores/idb';
 import { api } from '@/api';
 import { hmac } from '#/utils/hmac';
@@ -56,6 +55,7 @@ export default () => {
             sk.deserialize((await db.get(stores.record, bytes)).sk);
             const dk = decrypt(ca, sk, h);
             const buffers = [];
+            const { cat } = await import('#/utils/ipfs');
             for await (const buffer of cat(cid)) {
                 buffers.push(buffer);
             }
@@ -149,6 +149,7 @@ export default () => {
                                         <span className='text-sm text-dark-black mr-3'>{name}</span>
                                         <span className='text-2xs bg-[#AFD0FB] text-[#3C55D5] px-2 py-0.5 rounded-lg' onClick={async () => {
                                             const buffers = [];
+                                            const { cat } = await import('#/utils/ipfs');
                                             for await (const buffer of cat(cid)) {
                                                 buffers.push(buffer);
                                             }

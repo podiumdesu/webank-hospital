@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { encrypt, G1, randomGen } from '#/utils/pre';
 import { AES } from '#/utils/aes';
-import { add } from '#/utils/ipfs';
 import { g, h } from '#/constants';
 import { toDataURL } from 'qrcode';
 import { Box, Button, Dialog, DialogContent, DialogTitle, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
@@ -35,6 +34,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
             signature: uint8ArrayToHex(signature),
             recid,
         }), 'utf-8', '');
+        const { add } = await import('#/utils/ipfs');
         const { cid } = await add(new Blob([aes.iv, c]));
         const [ca0, ca1] = encrypt(dk, pk, g, h);
         setResult(await toDataURL([{

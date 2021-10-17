@@ -8,7 +8,6 @@ import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
 import { CID } from 'multiformats/cid';
 import { hmac } from '#/utils/hmac';
 import { AES } from '#/utils/aes';
-import { cat } from '#/utils/ipfs';
 import { api } from '@/api';
 import { db, stores } from '@/stores/idb';
 import { useMobxStore } from '@/stores/mobx';
@@ -53,6 +52,7 @@ export default () => {
 
             // check whether cid points to a file
             const buffers = [];
+            const { cat } = await import('#/utils/ipfs');
             for await (const buffer of cat(cid)) {
                 buffers.push(buffer);
             }

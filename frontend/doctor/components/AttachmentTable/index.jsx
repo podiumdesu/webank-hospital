@@ -5,7 +5,6 @@ import { Upload } from '$/components/Textfields/Upload';
 import { Table } from '$/components/Table';
 import React from 'react';
 import { AES } from '#/utils/aes';
-import { add } from '#/utils/ipfs';
 
 export const Attachment = ({ attachments, setAttachments, title }) => {
     const {
@@ -60,6 +59,7 @@ export const Attachment = ({ attachments, setAttachments, title }) => {
                     reader.onerror = () => reject(reader.error);
                     reader.readAsArrayBuffer(attachment[0]);
                 });
+                const { add } = await import('#/utils/ipfs');
                 const { cid } = await add(new Blob([aes.iv, await aes.encrypt(data, '', '')]));
                 setAttachments((attachments) => [...attachments, { id, name: attachment[0].name ?? '', cid: cid.toString(), dk }]);
                 handleReset();
