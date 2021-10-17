@@ -56,7 +56,7 @@ export const EditRecord = () => {
                 <Prescription drugs={drugs} setDrugs={setDrugs} />,
                 <Attachment attachments={attachments} setAttachments={setAttachments} title='辅助检查' />,
             ].map((element, index) => <Paper key={index}>{element}</Paper>)}
-            <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />,
+            <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />
             <Button
                 disabled={!isValid}
                 variant='contained'
