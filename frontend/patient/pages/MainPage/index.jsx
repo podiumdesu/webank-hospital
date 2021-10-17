@@ -38,7 +38,7 @@ const grid2data = await Promise.all(Object.keys(grid2Json).map((async i => {
 })))
 
 const getSectionItems = (icons) => Promise.all(Object.entries(icons).map(async ([path, module]) => {
-  const name = path.match(/(?<=\d+ ).*(?=\.png)/);
+  const name = path.match(/\S+(?=\.png$)/g)[0];
   return {
     icon: (await module()).default,
     text: name,
