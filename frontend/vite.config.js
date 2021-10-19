@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import reactRefresh from '@vitejs/plugin-react-refresh';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [reactRefresh()],
+  plugins: [react()],
   define: {
     'process.env.DUMP_SESSION_KEYS': '""'
   },
