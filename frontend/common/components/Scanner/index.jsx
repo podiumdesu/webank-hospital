@@ -8,6 +8,8 @@ export const Scanner = ({ onData, className }) => {
             return;
         }
         const video = document.createElement("video");
+        video.setAttribute("autoplay", "");
+        video.setAttribute("playsinline", "");
         const canvas = node.getContext("2d");
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: false,
