@@ -1,7 +1,7 @@
 import { Alert, Box, Button, Divider, Paper, Snackbar, Stack, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import { Scanner } from '#/components/Scanner';
 import React, { useEffect, useState, Fragment } from 'react';
-import { Fr, GT, keyGen, reDecrypt } from '#/utils/pre';
+import { G1, Fr, GT, keyGen, reDecrypt, idGen, deserialize } from '#/utils/pre';
 import { h } from '#/constants';
 import { toDataURL } from 'qrcode';
 import { CID } from 'multiformats/cid';
@@ -9,9 +9,8 @@ import { AES } from '#/utils/aes';
 import { api } from '$/api';
 import { keccak_256 } from 'js-sha3';
 import { hexToUint8Array, uint8ArrayToHex } from '#/utils/codec';
-import { ecdh } from 'secp256k1';
-import { clientConfig } from '$/config';
 import { SimpleTable } from '$/components/Table';
+import { db, stores } from '$/stores/idb';
 
 const Record = ({ data }) => (
     <>
@@ -90,20 +89,23 @@ const Examination = ({ data }) => (
     </>
 );
 
+if (!await db.count(stores.metadata, 'sk')) {
+    await db.put(stores.metadata, keyGen(h).sk.serialize(), 'sk');
+}
+const sk = deserialize(await db.get(stores.metadata, 'sk'), Fr);
+const pk = keyGen(h, sk).pk;
+
 export const Get = () => {
     const [step, setStep] = useState(0);
     const [src, setSrc] = useState('');
-    const [sk, setSk] = useState();
     const [message, setMessage] = useState('');
     const [data, setData] = useState();
     const [valid, setValid] = useState(false);
     useEffect(() => {
-        const { pk, sk } = keyGen(h);
         toDataURL([{
-            data: [...clientConfig.publicKey, ...pk.serialize()],
+            data: pk.serialize(),
             mode: 'byte'
         }]).then(setSrc);
-        setSk(sk);
     }, []);
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -113,14 +115,12 @@ export const Get = () => {
     };
     const handleData = async (data) => {
         try {
-            const bid = new Uint8Array(data.slice(33));
-            const dh = ecdh(data.slice(0, 33), clientConfig.privateKey);
-            for (let i = 0; i < 32; i++) {
-                bid[i + 2] ^= dh[i];
-            }
+            const pka = deserialize(data.slice(0, 48), G1);
+            const cid = CID.decode(data.slice(48));
+            const bid = idGen(pka, pk, cid.bytes).serialize();
             const buffers = [];
             const { cat } = await import('#/utils/ipfs');
-            for await (const buffer of cat(CID.decode(data.slice(33)))) {
+            for await (const buffer of cat(cid)) {
                 buffers.push(buffer);
             }
             const buffer = new Uint8Array(await new Blob(buffers).arrayBuffer());

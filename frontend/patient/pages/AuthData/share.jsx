@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Fr, G2, reKeyGen } from '#/utils/pre';
+import { G2, reKeyGen, keyDer, deserialize, idGen } from '#/utils/pre';
 import { Scanner } from '#/components/Scanner';
 import { toDataURL } from 'qrcode';
 import { Button, Steps, Toast } from 'antd-mobile';
@@ -8,8 +8,6 @@ import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
 import { api } from '@/api';
 import { hmac } from '#/utils/hmac';
 import { useMobxStore } from '@/stores/mobx';
-import { ecdh } from 'secp256k1';
-import { clientConfig } from '@/config';
 import { uint8ArrayToHex } from '#/utils/codec';
 
 const { Step } = Steps;
@@ -25,20 +23,13 @@ export default () => {
     }
     const handleData = async (buffer) => {
         try {
-            const bid = new Uint8Array(state.cid);
-            const dh = ecdh(buffer.slice(0, 33), clientConfig.privateKey);
-            for (let i = 0; i < 32; i++) {
-                bid[i + 2] ^= dh[i];
-            }
+            const pkb = deserialize(buffer, G2);
+            const bid = idGen(store.pk, pkb, state.cid).serialize();
             const aid = await hmac(state.cid, await store.hk, '');
-            const sk = new Fr();
-            sk.deserialize(state.sk);
-            const pk = new G2();
-            pk.deserialize(buffer.slice(33));
-            const rk = reKeyGen(sk, pk);
+            const rk = reKeyGen(keyDer(store.sk, state.cid), pkb);
             await api.reEncrypt(aid, uint8ArrayToHex(bid), rk.serializeToHexStr());
             setSrc(await toDataURL([{
-                data: [...clientConfig.publicKey, ...state.cid],
+                data: [...store.pk.serialize(), ...state.cid],
                 mode: 'byte'
             }]));
             Toast.show({

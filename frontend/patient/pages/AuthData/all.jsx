@@ -24,14 +24,14 @@ export default () => {
                 records
                     .concat(examinations)
                     .sort(([, a], [, b]) => new Date(b.time) - new Date(a.time))
-                    .map(([cid, { time, title, description, attachments, sk }], _idx) => (
+                    .map(([cid, { time, title, description, attachments }], _idx) => (
                         <Card
                             time={time}
                             title={title}
                             description={description}
                             attachment={attachments}
                             to='share'
-                            state={{ cid, sk }}
+                            state={{ cid }}
                             key={_idx}
                         />
                     ))

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { toDataURL } from 'qrcode';
-import { decrypt, Fr, G1, keyGen } from '#/utils/pre';
+import { decrypt, Fr, G1, deserialize, keyDer } from '#/utils/pre';
 import { Scanner } from '#/components/Scanner';
-import { g, h } from '#/constants';
+import { h } from '#/constants';
 import { Button, Form, Steps, Toast } from 'antd-mobile';
 import { CheckOutline, CloseOutline } from 'antd-mobile-icons';
 import { CID } from 'multiformats/cid';
@@ -23,17 +23,14 @@ export default () => {
     const [step, setStep] = useState(0);
     const [cid, setCid] = useState();
     const [ca, setCa] = useState();
-    const [sk, setSk] = useState();
     const [data, setData] = useState();
     const [valid, setValid] = useState(false);
     const store = useMobxStore();
     useEffect(() => {
-        const { pk, sk } = keyGen(g);
         toDataURL([{
-            data: pk.serialize(),
+            data: store.pk.serialize(),
             mode: 'byte'
         }]).then(setSrc);
-        setSk(sk);
     }, []);
     const handleData = async (data) => {
         try {
@@ -42,13 +39,11 @@ export default () => {
             setCid(cid);
 
             // validate and set ca
-            const ca = [new Fr(), new G1()];
-            ca[0].deserialize(data.slice(34, 66));
-            ca[1].deserialize(data.slice(-48));
+            const ca = [deserialize(data.slice(34, 66), Fr), deserialize(data.slice(-48), G1)];
             setCa(ca);
 
             // check whether ca is the encryption of dk
-            const dk = decrypt(ca, sk, h);
+            const dk = decrypt(ca, keyDer(store.sk, cid.bytes), h);
 
             // check whether cid points to a file
             const buffers = [];
@@ -99,7 +94,6 @@ export default () => {
                         title: `${data.hospital} ${data.department}`,
                         description: data.diagnosis,
                         attachments: data.attachments.map(({ name }) => name).join(', '),
-                        sk: sk.serialize()
                     }, cid.bytes);
                     break;
                 case 'examination':
@@ -108,7 +102,6 @@ export default () => {
                         title: `${data.hospital}`,
                         description: data.project,
                         attachments: data.attachments.map(({ name }) => name).join(', '),
-                        sk: sk.serialize()
                     }, cid.bytes);
                     break;
                 default:

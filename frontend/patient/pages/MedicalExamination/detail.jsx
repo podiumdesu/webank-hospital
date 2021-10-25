@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import { Toast } from 'antd-mobile';
 import { CloseOutline } from 'antd-mobile-icons';
 import { useParams } from 'react-router-dom';
-
 import { CID } from 'multiformats/cid';
-import { db, stores } from '@/stores/idb';
 import { api } from '@/api';
 import { hmac } from '#/utils/hmac';
 import { useMobxStore } from '@/stores/mobx';
-import { decrypt, Fr, G1 } from '#/utils/pre';
+import { decrypt, keyDer, deserializeHexStrToFr, deserializeHexStrToG1 } from '#/utils/pre';
 import { h } from '#/constants';
 import { AES } from '#/utils/aes';
 import { useAsyncEffect } from '#/hooks/useAsyncEffect';
@@ -26,12 +24,8 @@ export default () => {
             const bytes = CID.parse(cid).bytes;
             const id = await hmac(bytes, await store.hk, '');
             const [[ca0, ca1], timestamp] = await api.getRecord(id);
-            const ca = [new Fr(), new G1()];
-            ca[0].deserializeHexStr(ca0);
-            ca[1].deserializeHexStr(ca1);
-            const sk = new Fr();
-            sk.deserialize((await db.get(stores.examination, bytes)).sk);
-            const dk = decrypt(ca, sk, h);
+            const ca = [deserializeHexStrToFr(ca0), deserializeHexStrToG1(ca1)];
+            const dk = decrypt(ca, keyDer(store.sk, bytes), h);
             const buffers = [];
             const { cat } = await import('#/utils/ipfs');
             for await (const buffer of cat(cid)) {

@@ -33,6 +33,14 @@ export function keyGen(g, sk = randomInFr()) {
     return { sk, pk: mul(g, sk) };
 }
 
+export function keyDer(key, rand) {
+    return mul(key, hashToFr(rand));
+}
+
+export function idGen(pka, pkb, rand) {
+    return pow(pairing(pka, pkb), hashToFr(rand));
+}
+
 export function encrypt(plain, pk, g, h) {
     const r = randomInFr();
     return [
@@ -69,4 +77,10 @@ export function randomInFr() {
 
 export function serialize(obj) {
     return obj.serializeToHexStr();
+}
+
+export function deserialize(bytes, Class) {
+    const obj = new Class();
+    obj.deserialize(bytes);
+    return obj;
 }

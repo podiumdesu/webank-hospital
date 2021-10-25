@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { encrypt, G1, randomGen } from '#/utils/pre';
+import { encrypt, G1, randomGen, keyDer } from '#/utils/pre';
 import { AES } from '#/utils/aes';
 import { g, h } from '#/constants';
 import { toDataURL } from 'qrcode';
@@ -36,7 +36,7 @@ export const SubmissionDialog = ({ open, data, onFinish }) => {
         }), 'utf-8', '');
         const { add } = await import('#/utils/ipfs');
         const { cid } = await add(new Blob([aes.iv, c]));
-        const [ca0, ca1] = encrypt(dk, pk, g, h);
+        const [ca0, ca1] = encrypt(dk, keyDer(pk, cid.bytes), g, h);
         setResult(await toDataURL([{
             data: [...cid.bytes, ...ca0.serialize(), ...ca1.serialize()],
             mode: 'byte',
