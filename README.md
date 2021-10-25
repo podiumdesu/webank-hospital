@@ -2,7 +2,7 @@
 
 ## 简介
 
-医链，构建更美好的“链”上医疗平台，使数据由储于一个个医疗机构中的孤岛转变为以人为中心的全时空维度视图。平台基于代理重加密提出私密性更强的健康记录共享方案，并打破现有溯源合约显式存储所有权的传统，提出一套基于零知证明的药企供应链产品信息追溯服务方案。安全性更高，隐私性更完备，一站式解决就诊、异地复诊、取药、授权、溯源等问题，助力医疗行业实现健康和就诊数据的可信共享，加速医药数字化生态落地，促进全民建成互联互通的人口健康信息平台，为医疗大数据价值挖掘做技术背书。
+医链，构建更美好的“链”上医疗平台，使数据由储于一个个医疗机构中的孤岛转变为以人为中心的全时空维度视图。我们创新性地提出了密钥可重新随机化的代理重加密方案，并基于此实现了私密性更强的健康记录共享机制；同时打破现有溯源合约显式存储所有权的传统，提出一套基于零知证明的药企供应链产品信息追溯服务方案。安全性更高，隐私性更完备，一站式解决就诊、异地复诊、取药、授权、溯源等问题，助力医疗行业实现健康和就诊数据的可信共享，加速医药数字化生态落地，促进全民建成互联互通的人口健康信息平台，为医疗大数据价值挖掘做技术背书。
 
 ### 现有的问题
 
@@ -18,7 +18,7 @@
 
 ### 本作品的贡献
 
-* 使用AFGH方案的代理重加密，实现了 病历/医疗/体检 数据/记录 的授权
+* 创新性地提出了密钥可重新随机化的代理重加密，实现了 病历/医疗/体检 数据/记录 的授权
   * 方便健康记录共享、流转
   * 授权以用户为中心，用户是自己的健康数据的真正控制者，且能够进行记录级别的细粒度授权
   * 保证了保密性，只有用户授权的人员或机构才能解密数据，而合约无法解密
@@ -100,32 +100,35 @@
 
 各个角色申请加入联盟链。此时，各个角色均持有公私钥对`(PKx_ec, SKx_ec)`，由CA（假设是某个具有公信力的组织）负责对各个角色身份、签名、有效期等的认证。
 
+同时，授权流程中的各个角色生成PRE公私钥对`(PKx_pre, SKx_pre)`。
+
 ### 病历授权
 
 病历在上链后只能Create/Read，不能Update/Delete。
 
 #### Alice（患者）授权Bob（医生）Create
 
-1. Alice：生成*新的*PRE公私钥对`(PKa_pre, SKa_pre) = PRE.KeyGen()`
-2. Alice -> Bob：`PKa_pre`
-3. Bob：
-   1. 填写病历`m`
-   2. 以自己的私钥`SKb_ec`为病历签名：`sig = EC.Sign(SKb_ec, Hash(m))`
-   3. 生成对称密钥`DK`，加密病历：`c = Sym.Enc(DK, { m, sig })`
-   4. 以Alice的PRE公钥`PKa_pre`加密对称密钥：`DK' = PRE.Enc(PKa_pre, DK)`
-4. Bob -> IPFS：`c`
-5. IPFS：
-   1. `CID = Hash(c)`
-   2. `storage[CID] = c`
-6. IPFS -> Bob：`CID`
-7. Bob -> Alice：`CID`、`DK'`
-8. Alice：
-   1. 将`CID`与`SKa_pre`成对保存
-   2. 以`CID`生成`AID`：`AID = Hmac(CID, Hash(password + salt))`
-9. Alice -> 合约：`AID`、`DK'`
-10. 合约：判断`AID`是否存在
-     * 若存在，则throw
-     * 否则获取当前时间戳`timestamp = now()`并保存：`cas[AID] = (DK', timestamp)`
+1. Alice -> Bob：`PKa_pre`
+2. Bob：
+    1. 填写病历`m`
+    2. 以自己的私钥`SKb_ec`为病历签名：`sig = EC.Sign(SKb_ec, Hash(m))`
+    3. 生成对称密钥`DK`，加密病历：`c = Sym.Enc(DK, { m, sig })`
+3. Bob -> IPFS：`c`
+4. IPFS：
+    1. `CID = Hash(c)`
+    2. `storage[CID] = c`
+5. IPFS -> Bob：`CID`
+6. Bob：
+    1. 重新随机化Alice的PRE公钥`PKa_pre`：`PKa_pre' = RPRE.KeyDer(PKa_pre, CID)`
+    2. 以`PKa_pre'`加密对称密钥：`DK' = RPRE.Enc(PKa_pre', DK)`
+6. Bob -> Alice：`CID`、`DK'`
+7. Alice：
+    1. 保存`CID`
+    2. 以`CID`生成`AID`：`AID = Hmac(CID, Hash(password + salt))`
+8. Alice -> 合约：`AID`、`DK'`
+9. 合约：判断`AID`是否存在
+    * 若存在，则throw
+    * 否则获取当前时间戳`timestamp = now()`并保存：`cas[AID] = (DK', timestamp)`
 
 #### Alice（患者）Read
 
@@ -134,9 +137,10 @@
 3. Alice -> IPFS：`CID`
 4. IPFS -> Alice：`c = storage[CID]`
 5. Alice：
-   1. 以PRE私钥解密对称密钥：`DK = PRE.Dec(SKa_pre, DK')`
-   2. 以对称密钥解密病历：`{ m, sig } = Sym.Dec(c, DK)`
-   3. 必要时可以从CA获取Bob对应的公钥`PKb_ec`，验证真实性：`isValid = EC.Verify(PKb_ec, Hash(m), sig)`
+    1. 重新随机化自己的PRE私钥`SKa_pre`：`SKa_pre' = RPRE.KeyDer(SKa_pre, CID)`
+    2. 以`SKa_pre'`解密对称密钥：`DK = RPRE.Dec(SKa_pre', DK')`
+    3. 以对称密钥解密病历：`{ m, sig } = Sym.Dec(c, DK)`
+    4. 必要时可以从CA获取Bob对应的公钥`PKb_ec`，验证真实性：`isValid = EC.Verify(PKb_ec, Hash(m), sig)`
 
 #### Alice（患者）授权Carol（医生、药房或科研机构）Read
 
@@ -144,25 +148,25 @@
 
 `*`表示在离线场景下可以从CA处获取的数据。
 
-1. Carol：生成PRE公私钥对`(PKc_pre, SKc_pre) = PRE.KeyGen()`
-2. Carol -> Alice：`PKc_pre`(\*)、`PKc_ec`(\*)
-3. Alice：
-   1. 使用`CID`对应的PRE私钥`SKa_pre`与Carol的PRE公钥`PKc_pre`生成重加密密钥`RK = PRE.ReKeyGen(SKa_pre, PKc_pre)`
-   2. 生成`AID`：`AID = Hmac(CID, Hash(password + salt))`
-   3. 生成`BID`：`BID = EC.DH(SKa_ec, PKc_ec) xor CID`
-4. Alice -> 合约：`AID`、`BID`、`RK`
-5. 合约：
-   1. 以`AID`获取`(DK', timestamp) = cas[AID]`
-   2. 使用重加密密钥`RK`重加密`DK'`：`DK'' = PRE.ReEnc(RK, DK')`
-   3. 保存重加密后的对称密钥`DK''`：`cbs[BID] = (DK'', timestamp)`
-6. Alice -> Carol：`CID`、`PKa_ec`(\*)
-7. Carol：计算`BID = EC.DH(SKc_ec, PKa_ec) xor CID`
-8. Carol -> 合约：`BID`
-9. 合约 -> Carol：`(DK'', timestamp) = cbs[BID]`
-10. Carol -> IPFS：`CID`
-11. IPFS -> Carol：`c = storage[CID]`
-12. Carol：
-    1. 以PRE私钥解密对称密钥：`DK = PRE.ReDec(SKc_pre, DK'')`
+1. Carol -> Alice：`PKc_pre`(\*)
+2. Alice：
+    1. 重新随机化自己的PRE私钥`SKa_pre`：`SKa_pre' = RPRE.KeyDer(SKa_pre, CID)`
+    2. 使用`SKa_pre'`与Carol的PRE公钥`PKc_pre`生成重加密密钥`RK = RPRE.ReKeyGen(SKa_pre', PKc_pre)`
+    3. 生成`AID`：`AID = Hmac(CID, Hash(password + salt))`
+    4. 生成`BID`：`BID = RPRE.pairing(g, PKc_pre) ** SKa_pre'`
+3. Alice -> 合约：`AID`、`BID`、`RK`
+4. 合约：
+    1. 以`AID`获取`(DK', timestamp) = cas[AID]`
+    2. 使用重加密密钥`RK`重加密`DK'`：`DK'' = RPRE.ReEnc(RK, DK')`
+    3. 保存重加密后的对称密钥`DK''`：`cbs[BID] = (DK'', timestamp)`
+5. Alice -> Carol：`CID`、`PKa_pre`(\*)
+6. Carol：计算`BID = RPRE.pairing(PKa_pre, h) ** (SKc_pre * CID)`
+7. Carol -> 合约：`BID`
+8. 合约 -> Carol：`(DK'', timestamp) = cbs[BID]`
+9. Carol -> IPFS：`CID`
+10. IPFS -> Carol：`c = storage[CID]`
+11. Carol：
+    1. 以PRE私钥解密对称密钥：`DK = RPRE.ReDec(SKc_pre, DK'')`
     2. 以对称密钥解密病历：`{ m, sig } = Sym.Dec(c, DK)`
     3. 必要时可以从CA获取Bob对应的公钥`PKb_ec`，验证真实性：`isValid = EC.Verify(PKb_ec, Hash(m), sig)`
 
@@ -243,6 +247,21 @@
 * 重加密具有单向性，即*Proxy*无法通过$RK_{a→b}$计算出$RK_{b→a}$；
 * 防止*Proxy*与*Alice*或*Bob*中的任意一人共谋，解密出对方私钥（$RK_{a→b}=h^{b/a}$，已知$a$求解$b$与已知$b$求解$a$均为离散对数问题）；
 * 具备语义安全性。
+
+#### 密钥可重新随机化的代理重加密
+
+本作品提出了密钥可重新随机化的代理重加密（Proxy Re-Encryption with Rerandomizable Keys, RPRE）方案。据我们所知，该方案为我们首创。该方案受现有数字货币钱包的密钥生成方案启发，通过主密钥对动态生成会话密钥对，而无需存储会话密钥对，进一步减小了用户存储的开销。
+
+同时，本方案可以进行类似于冷热钱包的拓展，将主公钥公开，而将主私钥存储于冷钱包（硬件，如患者的医保卡）中，只有在解密时才上线。由此可以进一步地保证密钥的安全性。
+
+本方案在AFGH方案的基础上增加了公钥重新随机化与私钥重新随机化算法，描述如下：
+
+* 公钥重新随机化(PKDer)：
+    * 对于秘密值$id$与主公钥$MPK$，计算随机化后的$PK_{id} = MPK^{id}$
+* 私钥重新随机化(SKDer)：
+    * 对于秘密值$id$与主公钥$MSK$，计算随机化后的$SK_{id} = MSK \times id$
+
+直觉上而言，在攻击者的视角中，$PK_{id}$的分布与$MPK$相同，即他无法分辨$PK_{id}$与$MPK$，进而可以说明该方案的安全性与AFGH方案相同。完整的安全规约按下不表。
 
 ### 零知识证明
 
