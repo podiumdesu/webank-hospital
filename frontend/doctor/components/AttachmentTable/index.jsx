@@ -41,7 +41,6 @@ export const Attachment = ({ attachments, setAttachments, title }) => {
                     field: 'cid',
                     headerName: 'CID',
                     renderEditCell: () => <Box mx='auto'>自动填写</Box>,
-                    flex: 2
                 },
             ]}
             rows={attachments}
