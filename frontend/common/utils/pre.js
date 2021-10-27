@@ -1,6 +1,4 @@
-import mcl from 'mcl-wasm/browser';
-
-await mcl.init(mcl.BLS12_381);
+import * as mcl from './mcl';
 
 export const {
     deserializeHexStrToG1,
