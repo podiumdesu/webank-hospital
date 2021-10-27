@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import jsQR from 'jsqr';
 
-export const Scanner = ({ onData, className }) => {
+export const Scanner = ({ onData, className, style }) => {
     const [stream, setStream] = useState();
     const ref = useCallback(async (node) => {
         if (!node) {
@@ -47,5 +47,5 @@ export const Scanner = ({ onData, className }) => {
         requestAnimationFrame(tick);
     }, []);
     useEffect(() => () => stream?.getTracks()?.forEach(track => track.stop()), [stream]);
-    return <canvas ref={ref} height={0} style={{ display: 'block', width: '100%' }} className={className} />;
+    return <canvas ref={ref} height={0} style={{ display: 'block', width: '100%', ...style }} className={className} />;
 };
