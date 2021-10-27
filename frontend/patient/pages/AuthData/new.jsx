@@ -131,12 +131,12 @@ export default () => {
             {
                 [
                     <div className='flex flex-col items-center'>
-                        <p className='font-bold text-xl'>请出示下面的二维码</p>
+                        <p className='font-bold mt-4 text-xl'>请出示下面的二维码</p>
                         <img src={src} alt='' />
                         <Button className='text-[#61A1F8] border-[#61A1F8]' onClick={() => setStep(1)}>下一步</Button>
                     </div>,
                     <div className='flex flex-col items-center gap-2'>
-                        <p className='font-bold text-xl'>请扫描医生的二维码</p>
+                        <p className='font-bold mt-4 text-xl'>请扫描医生的二维码</p>
                         <Scanner onData={handleData} className='rounded-xl' />
                     </div>,
                     <Form
