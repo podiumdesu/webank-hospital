@@ -15,8 +15,6 @@ export const Scanner = ({ onData, className }) => {
             audio: false,
             video: {
                 facingMode: "environment",
-                width: { min: 1280 },
-                height: { min: 720 },
             }
         });
         setStream(stream);
@@ -49,5 +47,5 @@ export const Scanner = ({ onData, className }) => {
         requestAnimationFrame(tick);
     }, []);
     useEffect(() => () => stream?.getTracks()?.forEach(track => track.stop()), [stream]);
-    return <canvas ref={ref} height={400} style={{ display: 'block', width: '80%', height: '400px', marginTop: '40px' }} className={className} />;
+    return <canvas ref={ref} height={0} style={{ display: 'block', width: '100%' }} className={className} />;
 };

@@ -137,7 +137,9 @@ export default () => {
                     </div>,
                     <div className='flex flex-col items-center gap-2'>
                         <p className='font-bold mt-4 text-xl'>请扫描医生的二维码</p>
-                        <Scanner onData={handleData} className='rounded-xl' />
+                        <div className='m-2'>
+                            <Scanner onData={handleData} className='rounded-xl' />
+                        </div>
                     </div>,
                     <Form
                         className='flex flex-col items-center gap-2'

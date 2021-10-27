@@ -56,7 +56,9 @@ export default () => {
                 [
                     <div className='flex flex-col items-center gap-2'>
                         <p className='font-bold text-xl mt-4'>请扫描医生的二维码</p>
-                        <Scanner onData={handleData} className='rounded-xl' />
+                        <div className='m-2'>
+                            <Scanner onData={handleData} className='rounded-xl' />
+                        </div>
                     </div>,
                     <div className='flex flex-col items-center'>
                         <p className='font-bold text-xl mt-4'>请出示下面的二维码</p>

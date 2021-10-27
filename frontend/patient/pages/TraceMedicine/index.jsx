@@ -58,9 +58,11 @@ export default () => {
             </Steps>
             {
                 [
-                    <div className='flex flex-col items-center'>
-                        <p className='font-bold text-xl'>请扫描药品包装上的溯源码</p>
-                        <Scanner onData={handleData}  className='rounded-xl' />
+                    <div className='flex flex-col items-center gap-2'>
+                        <p className='font-bold text-xl mt-4'>请扫描药品包装上的溯源码</p>
+                        <div className='m-2'>
+                            <Scanner onData={handleData} className='rounded-xl' />
+                        </div>
                     </div>,
                     <div className="flex flex-col items-center">
                         {trace.map(({ data, valid }, index) => (
