@@ -6,7 +6,7 @@ import React from 'react';
 
 export const Basic = ({ control }) => {
     return (
-        <Box sx={{ px: 2, py: 1 }}>
+        <Box>
             <Typography variant='h5' gutterBottom>基本信息</Typography>
             <Divider sx={{ mb: 2 }} />
             <Stack spacing={2}>

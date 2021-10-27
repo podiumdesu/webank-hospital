@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Paper, Stack } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { randomHexString } from '#/utils/random';
 import { Basic } from './Basic';
 import { Prescription } from './Prescription';
 import { Attachment } from '$/components/AttachmentTable';
-import { SubmissionDialog } from '$/components/SubmissionDialog';
+import { EditStepper } from '$/components/EditStepper';
 import { clientConfig } from '$/config';
 
 const getDefaultValue = () => ({
@@ -26,46 +26,41 @@ const getDefaultValue = () => ({
     plan: '',
 });
 
-export const EditRecord = () => {
+const RecordForm = ({ onUpload }) => {
     const [drugs, setDrugs] = useState([]);
     const [attachments, setAttachments] = useState([]);
-    const [data, setData] = useState(undefined);
     const {
         control,
-        formState: { isValid },
+        formState: { isValid, isSubmitting },
         reset,
         handleSubmit,
     } = useForm({
         mode: 'onChange',
         defaultValues: getDefaultValue()
     });
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         data.age = +data.age;
-        setData({ ...data, drugs, attachments });
-    };
-    const onFinish = () => {
+        await onUpload({ ...data, drugs, attachments });
         reset(getDefaultValue());
-        setData(undefined);
         setDrugs([]);
         setAttachments([]);
     };
     return (
         <Stack spacing={1} flex='1' overflow='auto' p={1} component='form' onSubmit={handleSubmit(onSubmit)}>
-            {[
-                <Basic control={control} isValid={isValid} />,
-                <Prescription drugs={drugs} setDrugs={setDrugs} />,
-                <Attachment attachments={attachments} setAttachments={setAttachments} title='辅助检查' />,
-            ].map((element, index) => <Paper key={index}>{element}</Paper>)}
-            <SubmissionDialog open={!!data} data={data} onFinish={onFinish} />
+            <Basic control={control} isValid={isValid} />
+            <Prescription drugs={drugs} setDrugs={setDrugs} />
+            <Attachment attachments={attachments} setAttachments={setAttachments} title='辅助检查' />
             <Button
-                disabled={!isValid}
+                disabled={!isValid || isSubmitting}
                 variant='contained'
                 color='primary'
                 type='submit'
                 fullWidth
             >
-                提交
+                {isSubmitting ? '上传中' : '加密并上传'}
             </Button>
         </Stack>
     );
-};
+}
+
+export const EditRecord = () => <EditStepper Form={RecordForm} />;
