@@ -49,5 +49,5 @@ export const Scanner = ({ onData, className }) => {
         requestAnimationFrame(tick);
     }, []);
     useEffect(() => () => stream?.getTracks()?.forEach(track => track.stop()), [stream]);
-    return <canvas ref={ref} height={0} style={{ display: 'block', width: '100%' }} className={className} />;
+    return <canvas ref={ref} height={400} style={{ display: 'block', width: '80%', height: '400px', marginTop: '40px' }} className={className} />;
 };
