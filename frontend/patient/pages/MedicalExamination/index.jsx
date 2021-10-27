@@ -15,7 +15,7 @@ export default () => {
 
     return (
         <div className='px-4'>
-            {
+            {examinations.length > 0 ? (
                 examinations.map(([cid, { time, title, description, attachments }], _idx) => (
                     <Card
                         time={time}
@@ -26,7 +26,12 @@ export default () => {
                         key={_idx}
                     />
                 ))
-            }
+            ) : (
+                <div>
+                    <img className="w-full mt-12" src='https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg' alt=""/>
+                    <p className="text-sm mt-10 text-center">暂时没有您的体检记录哦，期待您加入医链</p>
+                </div>
+            )}
         </div>
     );
 }
