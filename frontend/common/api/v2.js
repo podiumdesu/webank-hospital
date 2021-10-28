@@ -7,10 +7,10 @@ import axios from 'axios';
 import { ENDPOINT } from '#/constants';
 
 const addresses = {
-    ca: '0x47d43107ff3097acfcf4182b5fd612e460c430a2',
-    meta: '0x8fe657c4a8014aa564dc9c73790d0b9c7de8d7f4',
-    record: '0x04f74d393d09e8f5b044b4f2f984ac7e88822f6d',
-    trace: '0x41d838b4a0adf5c469d613dd7b1cc4d4c94d2c51'
+    ca: '0x4ac9742832654282dabc8f233a051b0540b26148',
+    meta: '0x47d43107ff3097acfcf4182b5fd612e460c430a2',
+    record: '0x8fe657c4a8014aa564dc9c73790d0b9c7de8d7f4',
+    trace: '0x04f74d393d09e8f5b044b4f2f984ac7e88822f6d'
 };
 
 export class ClientConfig {
