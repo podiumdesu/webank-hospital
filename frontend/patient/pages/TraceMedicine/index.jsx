@@ -62,7 +62,6 @@ export default () => {
             return false;
         }
     };
-    console.log(signature);
     return (
         <div className='px-4 flex-1 bg-[#C8DBFF33]'>
             <Steps current={step}>
