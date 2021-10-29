@@ -17,6 +17,7 @@ export const Scanner = ({ onData, className, style }) => {
                 facingMode: "environment",
             }
         });
+        let pending = false;
         setStream(stream);
         const tick = async () => {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -34,9 +35,14 @@ export const Scanner = ({ onData, className, style }) => {
                     canvas.lineWidth = 4;
                     canvas.strokeStyle = "#FF3B58";
                     canvas.stroke();
-                    if (await onData(new Uint8Array(binaryData))) {
-                        stream.getTracks().forEach(track => track.stop());
-                        return;
+                    if (!pending) {
+                        pending = true;
+                        const result = await onData(new Uint8Array(binaryData));
+                        pending = false;
+                        if (result) {
+                            stream.getTracks().forEach(track => track.stop());
+                            return;
+                        }
                     }
                 }
             }
