@@ -74,8 +74,8 @@ export const clientConfig = new Configuration({
 });
 
 export const addresses = {
-    ca: '0x4ac9742832654282dabc8f233a051b0540b26148',
-    meta: '0x47d43107ff3097acfcf4182b5fd612e460c430a2',
-    record: '0x8fe657c4a8014aa564dc9c73790d0b9c7de8d7f4',
-    trace: '0x04f74d393d09e8f5b044b4f2f984ac7e88822f6d'
+    ca: '0x41d838b4a0adf5c469d613dd7b1cc4d4c94d2c51',
+    meta: '0xcea0b5b69943f9e2361bd2248fe06efb4c217661',
+    record: '0x53803b4e658ab042b66b998c8a97179cbb3d213d',
+    trace: '0x4c3d6d1df378e0585ad8696a2a2d413c37ccc26d'
 };
