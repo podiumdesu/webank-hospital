@@ -4,6 +4,14 @@
 
 医链，构建更美好的“链”上医疗平台，使数据由储于一个个医疗机构中的孤岛转变为以人为中心的全时空维度视图。我们创新性地提出了密钥可重新随机化的代理重加密方案，并基于此实现了私密性更强的健康记录共享机制；同时打破现有溯源合约显式存储所有权的传统，提出一套基于零知识证明与聚合签名的药企供应链产品信息追溯服务方案。安全性更高，隐私性更完备，一站式解决就诊、异地复诊、取药、授权、溯源等问题，助力医疗行业实现健康和就诊数据的可信共享，加速医药数字化生态落地，促进全民建成互联互通的人口健康信息平台，为医疗大数据价值挖掘做技术背书。
 
+<center style="display: flex; justify-content: center">  
+  <div>
+    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw12vsvpkij30lq0liaba.jpg" width="200"/>
+    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/patient</a></p>
+    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
+  </div>
+</center>
+
 ## 二、技术创新点
 
 ### （1）基于密钥可重新随机化的代理重加密(Proxy Re-Encryption with Rerandomizable Keys)的电子健康记录的共享方案
@@ -77,7 +85,9 @@
 
 ### （1）系统架构
 
-![image.png](https://i.loli.net/2021/10/31/M87JmO15LINtRqG.png)
+
+
+<img src="images/INTRO.images/image-20211102202533637.png" alt="image-20211102202533637" style="zoom:50%;" />
 
 ### （2）技术栈
 
@@ -137,7 +147,7 @@
     1. 若$AID$已存在，则throw
     2. 保存键值对$AID \to DK'$
 
-![image.png](https://i.loli.net/2021/10/31/7KvJDPtbxwYBXnU.png)
+<img src="https://i.loli.net/2021/10/31/7KvJDPtbxwYBXnU.png" alt="image.png" style="zoom:30%;" />
 
 ##### (b) Alice（患者）读取病历
 
@@ -510,4 +520,26 @@ npm run start:prod
 | 香港大学博士生     | 张诚儒 | 全栈工程师           |
 | 华中科技大学本科生 | 陈洁   | 视觉设计师           |
 | 华中科技大学本科生 | 鄢宁   | 交互设计师           |
+
+
+
+## 七、“医链”使用方法
+
+<center style="display: flex; justify-content: center">  
+  <div style="margin-right: 20px">
+    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw12vsvpkij30lq0liaba.jpg" width="200"/>
+    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/patient</a></p>
+    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
+  </div>
+  <div style="">
+    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw131itzmzj306d06bwep.jpg" width="200"/>
+    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/doctor</a></p>
+    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
+  </div>
+    <div style="margin-left: 20px">
+    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw12vsvpkij30lq0liaba.jpg" width="200"/>
+    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/supplyChain</a></p>
+    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
+  </div>
+</center>
 
