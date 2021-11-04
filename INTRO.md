@@ -4,17 +4,9 @@
 
 医链，构建更美好的“链”上医疗平台，使数据由储于一个个医疗机构中的孤岛转变为以人为中心的全时空维度视图。我们创新性地提出了密钥可重新随机化的代理重加密方案，并基于此实现了私密性更强的健康记录共享机制；同时打破现有溯源合约显式存储所有权的传统，提出一套基于零知识证明与聚合签名的药企供应链产品信息追溯服务方案。安全性更高，隐私性更完备，一站式解决就诊、异地复诊、取药、授权、溯源等问题，助力医疗行业实现健康和就诊数据的可信共享，加速医药数字化生态落地，促进全民建成互联互通的人口健康信息平台，为医疗大数据价值挖掘做技术背书。
 
-<center style="display: flex; justify-content: center">  
-  <div>
-    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw12vsvpkij30lq0liaba.jpg" width="200"/>
-    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/patient</a></p>
-    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
-  </div>
-</center>
-
 ## 二、技术创新点
 
-### （1）基于密钥可重新随机化的代理重加密(Proxy Re-Encryption with Rerandomizable Keys)的电子健康记录的共享方案
+### （1）基于密钥可重新随机化的代理重加密(Proxy Re-Encryption with Rerandomi-zable Keys)的电子健康记录的共享方案
 
 提及个人健康记录，安全和隐私是患者最为关心的，同时个人应当拥有是否透露细节的权利。如果不能解决链上电子病历流转过程中的隐私泄露和滥用问题，那么就无法保障上“链”患者的数据安全。于是我们提出了基于代理重加密的共享方案。作为加密数据存储和共享必不可少的加密工具，代理重加密已被广泛用于保护存储在第三方的数据的机密性。
 
@@ -44,6 +36,13 @@
 4. 溯源码只有物理接触医药产品才能获取，由此防止了其他人对供应链的恶意追踪，保护了各个中间环节的利益。
 
 ## 三、功能特色
+
+<center style="display: flex; justify-content: center">  
+  <div>
+    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw1vc3ryhpj30sz0dt76p.jpg" width="800"/>
+    <p style="margin: 5px 0 10px 0; color: rgba(0,0,0,0.3)">基于FISCO-BCOS的数据存证链</p>
+  </div>
+</center>
 
 ### （1）解决分散就诊记录的数据孤岛问题，健康记录一链直达
 
@@ -147,7 +146,7 @@
     1. 若$AID$已存在，则throw
     2. 保存键值对$AID \to DK'$
 
-<img src="https://i.loli.net/2021/10/31/7KvJDPtbxwYBXnU.png" alt="image.png" style="zoom:30%;" />
+<img src="https://i.loli.net/2021/10/31/7KvJDPtbxwYBXnU.png" alt="image.png" style="zoom:40%;" />
 
 ##### (b) Alice（患者）读取病历
 
@@ -222,7 +221,7 @@
     1. 验证$\mathrm{Prove}_\texttt{STARK}(ID, \pi)$，若不为$True$，则throw
     2. 保存键值对$ID \to (\{c_1\}, \sigma_{agg} := \epsilon, \sigma_{tmp} := \sigma_{1,1})$
 
-![image.png](https://i.loli.net/2021/10/31/v2ZB9Xkq5gwbxSW.png)
+<img src="https://i.loli.net/2021/10/31/v2ZB9Xkq5gwbxSW.png" alt="image.png" style="zoom:50%;" />
 
 ##### (c\) Frank（第i个环节的参与者）验证Erin（第i-1个环节的参与者）的信息
 
@@ -245,7 +244,7 @@
     2. 获取此前所有相邻节点的聚合签名$\sigma_{agg}$，将其与$\sigma_{agg}'$再次聚合：$\sigma_{agg} := \mathrm{AggregateSig}_\texttt{BLS}(\{\sigma_{agg}, \sigma_{agg}'\})$
     3. 保存键值对$ID \to (\{c_j|1\le j < i\} \cup c_i, \sigma_{agg}, \sigma_{tmp} := \sigma_{i,i})$
 
-![image.png](https://i.loli.net/2021/10/31/P5JMeZVENvzncIt.png)
+<img src="https://i.loli.net/2021/10/31/P5JMeZVENvzncIt.png" alt="image.png" style="zoom:35%;" />
 
 ##### (d) Grace（患者或政府部门）查询/抽检 供应链
 
@@ -259,7 +258,7 @@
    4. 将$\sigma_{agg}$与$\sigma_{agg}'$再次聚合：$\sigma_{agg} := \mathrm{AggregateSig}_\texttt{BLS}(\{\sigma_{agg}, \sigma_{agg}'\})$
    5. 从CA获取trace中每个参与者对应的公钥$\{PK_{\texttt{BLS}, i}|1 \le i \le n\}$，验证真实性：$\mathrm{Verify}_\texttt{BLS}(\{PK_{\texttt{BLS}, i}|1 \le i \le n\}, \{\mathrm{Hash}(c_i)|1\le i \le n\}, \sigma_{agg})$
 
-![image.png](https://i.loli.net/2021/10/31/1q2panbYmcTGN5W.png)
+<img src="https://i.loli.net/2021/10/31/1q2panbYmcTGN5W.png" alt="image.png" style="zoom:50%;" />
 
 ### （4）核心算法
 
@@ -520,26 +519,4 @@ npm run start:prod
 | 香港大学博士生     | 张诚儒 | 全栈工程师           |
 | 华中科技大学本科生 | 陈洁   | 视觉设计师           |
 | 华中科技大学本科生 | 鄢宁   | 交互设计师           |
-
-
-
-## 七、“医链”使用方法
-
-<center style="display: flex; justify-content: center">  
-  <div style="margin-right: 20px">
-    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw12vsvpkij30lq0liaba.jpg" width="200"/>
-    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/patient</a></p>
-    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
-  </div>
-  <div style="">
-    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw131itzmzj306d06bwep.jpg" width="200"/>
-    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/doctor</a></p>
-    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
-  </div>
-    <div style="margin-left: 20px">
-    <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw12vsvpkij30lq0liaba.jpg" width="200"/>
-    <p style="margin: 5px 0 0 0"><a>https://mc.trchk.top/supplyChain</a></p>
-    <p style="margin: 3px 0 0 0">您可以扫描此二维码访问“医链”</p>
-  </div>
-</center>
 
