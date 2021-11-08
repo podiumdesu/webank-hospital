@@ -461,6 +461,10 @@ cargo build --release
 cp ./target/wasm32-unknown-unknown/release/rescue.wasm ../frontend/common/utils/rescue/
 ```
 
+#### 配置
+
+修改`common/api/v2.js`中`addresses`的各个字段
+
 #### 打包构建用户界面
 
 ```bash
