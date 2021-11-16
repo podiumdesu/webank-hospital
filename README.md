@@ -6,7 +6,7 @@
 
 ## 许可证
 
-本项目以双重许可（dual-license）的形式开源。其中，软件本身的许可证为[AGPLv3](./LICENSE.AGPLv3)，而所有静态资源（图片、视频等）、文本文件的许可证为[CC BY-NC-ND 4.0]。
+本项目以双重许可（dual-license）的形式开源。其中，软件本身的许可证为[AGPLv3](./LICENSE.AGPLv3)，而所有静态资源（图片、视频等）、文本文件的许可证为[CC BY-NC-ND 4.0](./LICENSE.CC-BY-NC-ND-4.0)。
 
 ### 现有的问题
 
